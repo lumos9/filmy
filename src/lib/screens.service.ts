@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabaseClient } from "./supabase";
 import { Database } from "./database.types";
 
 type Screen = Database["public"]["Tables"]["screens"]["Row"];
@@ -14,6 +14,7 @@ export class ScreensService {
       const from = (page - 1) * limit;
       const to = from + limit - 1;
 
+      const supabase = getSupabaseClient();
       const { data, error, count } = await supabase
         .from("screens")
         .select("*", { count: "exact" })
@@ -40,6 +41,7 @@ export class ScreensService {
    */
   static async getScreenById(id: string): Promise<Screen | null> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("screens")
         .select("*")
@@ -47,7 +49,7 @@ export class ScreensService {
         .single();
 
       if (error) {
-        if (error.code === "PGRST116") {
+        if ((error as any).code === "PGRST116") {
           return null; // Screen not found
         }
         throw new Error(`Failed to fetch screen: ${error.message}`);
@@ -65,6 +67,7 @@ export class ScreensService {
    */
   static async createScreen(screen: ScreenInsert): Promise<Screen> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("screens")
         .insert(screen)
@@ -75,7 +78,7 @@ export class ScreensService {
         throw new Error(`Failed to create screen: ${error.message}`);
       }
 
-      return data;
+      return data as Screen;
     } catch (error) {
       console.error("Error creating screen:", error);
       throw error;
@@ -90,6 +93,7 @@ export class ScreensService {
     updates: ScreenUpdate
   ): Promise<Screen> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("screens")
         .update({ ...updates, updated_at: new Date().toISOString() })
@@ -101,7 +105,7 @@ export class ScreensService {
         throw new Error(`Failed to update screen: ${error.message}`);
       }
 
-      return data;
+      return data as Screen;
     } catch (error) {
       console.error("Error updating screen:", error);
       throw error;
@@ -113,6 +117,7 @@ export class ScreensService {
    */
   static async deleteScreen(id: string): Promise<void> {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase.from("screens").delete().eq("id", id);
 
       if (error) {

@@ -78,7 +78,15 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = (await searchParams) ?? {};
+  const page = Number(params.page ?? 1);
+  const pageSize = Number(params.pageSize ?? 25);
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">

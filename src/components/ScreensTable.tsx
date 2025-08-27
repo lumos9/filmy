@@ -76,7 +76,7 @@ export default function ScreensTable({
         </CardTitle>
         <Separator />
       </CardHeader> */}
-      <CardContent className="p-0">
+      <CardContent className="px-4">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -98,10 +98,10 @@ export default function ScreensTable({
                   <TableCell>
                     <div className="space-y-1">
                       <div className="font-medium">
-                        {screen.country || "N/A"}
+                        {screen.city}, {screen.state || "N/A"}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {screen.city}, {screen.state || "N/A"}
+                        {screen.country || "N/A"}
                       </div>
                     </div>
                   </TableCell>

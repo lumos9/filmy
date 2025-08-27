@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabaseClient } from "./supabase";
 import { Database } from "./database.types";
 
 type Movie = Database["public"]["Tables"]["movies"]["Row"];
@@ -14,6 +14,7 @@ export class MoviesService {
       const from = (page - 1) * limit;
       const to = from + limit - 1;
 
+      const supabase = getSupabaseClient();
       const { data, error, count } = await supabase
         .from("movies")
         .select("*", { count: "exact" })
@@ -40,6 +41,7 @@ export class MoviesService {
    */
   static async getMovieById(id: string): Promise<Movie | null> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("movies")
         .select("*")
@@ -47,13 +49,13 @@ export class MoviesService {
         .single();
 
       if (error) {
-        if (error.code === "PGRST116") {
+        if ((error as any).code === "PGRST116") {
           return null; // Movie not found
         }
         throw new Error(`Failed to fetch movie: ${error.message}`);
       }
 
-      return data;
+      return data as Movie;
     } catch (error) {
       console.error("Error fetching movie:", error);
       throw error;
@@ -65,6 +67,7 @@ export class MoviesService {
    */
   static async getRandomMovie(): Promise<Movie | null> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("movies")
         .select("*")
@@ -75,7 +78,7 @@ export class MoviesService {
         throw new Error(`Failed to fetch random movie: ${error.message}`);
       }
 
-      return data?.[0] || null;
+      return (data?.[0] as Movie) || null;
     } catch (error) {
       console.error("Error fetching random movie:", error);
       throw error;
@@ -87,6 +90,7 @@ export class MoviesService {
    */
   static async createMovie(movie: MovieInsert): Promise<Movie> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("movies")
         .insert(movie)
@@ -97,7 +101,7 @@ export class MoviesService {
         throw new Error(`Failed to create movie: ${error.message}`);
       }
 
-      return data;
+      return data as Movie;
     } catch (error) {
       console.error("Error creating movie:", error);
       throw error;
@@ -109,6 +113,7 @@ export class MoviesService {
    */
   static async updateMovie(id: string, updates: MovieUpdate): Promise<Movie> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from("movies")
         .update({ ...updates, updated_at: new Date().toISOString() })
@@ -120,7 +125,7 @@ export class MoviesService {
         throw new Error(`Failed to update movie: ${error.message}`);
       }
 
-      return data;
+      return data as Movie;
     } catch (error) {
       console.error("Error updating movie:", error);
       throw error;
@@ -132,6 +137,7 @@ export class MoviesService {
    */
   static async deleteMovie(id: string): Promise<void> {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase.from("movies").delete().eq("id", id);
 
       if (error) {
