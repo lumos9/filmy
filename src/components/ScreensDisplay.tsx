@@ -15,6 +15,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 
 export default function ScreensDisplay() {
   const [page, setPage] = useState(1);
@@ -175,23 +182,23 @@ export default function ScreensDisplay() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="text-left">
+      <div className="flex flex-col md:flex-row items-center justify-center md:justify-between flex-wrap gap-3">
+        <div className="text-center md:text-left">
           <h1 className="text-2xl font-semibold">Screen Database</h1>
           <div className="flex items-center gap-2 text-muted-foreground mt-1">
-            <span>
+            <span className="text-center">
               {isLoading
                 ? "Loading screens..."
                 : `Showing ${screens.length} of ${totalCount} screens`}
             </span>
-            {!isLoading && (
+            {/* {!isLoading && (
               <Badge variant="secondary">
                 Page {currentPage} / {totalPages}
               </Badge>
-            )}
+            )} */}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Per page:</span>
           {perPageOptions.map((ps) => (
             <Button
@@ -206,11 +213,35 @@ export default function ScreensDisplay() {
               {ps}
             </Button>
           ))}
+        </div>*/}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Per page:</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="outline">
+                {pageSize} {/* currently selected page size */}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {[10, 20, 50, 100].map((ps) => (
+                <DropdownMenuItem
+                  key={ps}
+                  onSelect={() => {
+                    setPage(1);
+                    setPageSize(ps);
+                  }}
+                >
+                  {ps}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Top pagination */}
       {PaginationNav}
+      <Separator />
 
       {isLoading ? (
         <Card className="p-6">

@@ -55,12 +55,13 @@ export interface Database {
           city: string | null;
           state: string | null;
           organization: string | null;
-          projection: string | null;
-          format: string | null;
-          dimension: string | null;
           screen_type: string | null;
           seats: number | null;
-          screen_size: string | null;
+          screen_size_ft: string | null;
+          screen_size_m: string | null;
+          formats: string[]; // array of formats
+          dimensions: string[]; // array of dimensions
+          projections: string[]; // array of projections
           opened_date: string | null;
           created_at: string;
           updated_at: string;
@@ -71,12 +72,13 @@ export interface Database {
           city?: string | null;
           state?: string | null;
           organization?: string | null;
-          projection?: string | null;
-          format?: string | null;
-          dimension?: string | null;
           screen_type?: string | null;
           seats?: number | null;
-          screen_size?: string | null;
+          screen_size_ft?: string | null;
+          screen_size_m?: string | null;
+          formats?: string[]; // optional array
+          dimensions?: string[]; // optional array
+          projections?: string[]; // optional array
           opened_date?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -87,12 +89,13 @@ export interface Database {
           city?: string | null;
           state?: string | null;
           organization?: string | null;
-          projection?: string | null;
-          format?: string | null;
-          dimension?: string | null;
           screen_type?: string | null;
           seats?: number | null;
-          screen_size?: string | null;
+          screen_size_ft?: string | null;
+          screen_size_m?: string | null;
+          formats?: string[]; // optional array
+          dimensions?: string[]; // optional array
+          projections?: string[]; // optional array
           opened_date?: string | null;
           created_at?: string;
           updated_at?: string;

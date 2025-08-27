@@ -39,7 +39,7 @@ export default function ScreensTable({
   const getDimensionBadge = (dimension: string | null) => {
     if (!dimension) return <Badge variant="secondary">N/A</Badge>;
     return (
-      <Badge variant={dimension === "3D" ? "default" : "secondary"}>
+      <Badge variant={dimension === "3D" ? "default" : "outline"}>
         {dimension}
       </Badge>
     );
@@ -68,77 +68,71 @@ export default function ScreensTable({
   }
 
   return (
-    <Card className={className}>
-      {/* <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span>Screen Database</span>
-          <Badge variant="secondary">{screens.length} screens</Badge>
-        </CardTitle>
-        <Separator />
-      </CardHeader> */}
-      <CardContent className="px-4">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">Location</TableHead>
-                <TableHead className="w-[150px]">Organization</TableHead>
-                <TableHead className="w-[120px]">Projection</TableHead>
-                <TableHead className="w-[80px]">Format</TableHead>
-                <TableHead className="w-[80px]">Dimension</TableHead>
-                <TableHead className="w-[100px]">Type</TableHead>
-                <TableHead className="w-[80px] text-right">Seats</TableHead>
-                <TableHead className="w-[120px]">Screen Size</TableHead>
-                <TableHead className="w-[100px]">Opened</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {screens.map((screen) => (
-                <TableRow key={screen.id} className="hover:bg-muted/50">
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">
-                        {screen.city}, {screen.state || "N/A"}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {screen.country || "N/A"}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">
-                      {screen.organization || "N/A"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">
-                      {screen.projection || "N/A"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{screen.format || "N/A"}</Badge>
-                  </TableCell>
-                  <TableCell>{getDimensionBadge(screen.dimension)}</TableCell>
-                  <TableCell>
-                    {getScreenTypeBadge(screen.screen_type)}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatSeats(screen.seats)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">{screen.screen_size || "N/A"}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(screen.opened_date)}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow className="text-center">
+            <TableHead className="w-[120px] text-left">Location</TableHead>
+            {/* <TableHead className="w-[150px]">Organization</TableHead> */}
+            <TableHead className="w-[120px] text-left">Projection</TableHead>
+            <TableHead className="w-[80px] text-left">Format</TableHead>
+            <TableHead className="w-[80px] text-left">Dimension</TableHead>
+            <TableHead className="w-[100px] text-left">Type</TableHead>
+            <TableHead className="w-[80px] text-left">Seats</TableHead>
+            <TableHead className="w-[120px] text-left">Screen Size</TableHead>
+            <TableHead className="w-[100px] text-left">Opened</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {screens.map((screen) => (
+            <TableRow key={screen.id} className="hover:bg-muted/50">
+              <TableCell>
+                <div className="space-y-1 line-clamp-2 break-words max-w-xs">
+                  <div className="font-medium">
+                    {screen.organization || "N/A"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {screen.city}, {screen.state || "N/A"},{" "}
+                    {screen.country || "N/A"}
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="font-medium">{screen.projections || "N/A"}</div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  {screen.formats?.map((f) => (
+                    <Badge variant="outline" key={f}>
+                      {f}
+                    </Badge>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col gap-1">
+                  {screen.dimensions?.join(", ")}
+                </div>
+              </TableCell>
+              <TableCell>{screen.screen_type}</TableCell>
+              <TableCell className="font-medium">
+                {formatSeats(screen.seats)}
+              </TableCell>
+              <TableCell className="flex flex-col space-y-1">
+                <div className="text-sm">{screen.screen_size_ft || "N/A"}</div>
+                <div className="text-sm text-muted-foreground">
+                  {screen.screen_size_m || "N/A"}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm text-muted-foreground">
+                  {formatDate(screen.opened_date)}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
