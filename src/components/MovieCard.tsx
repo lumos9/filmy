@@ -1,25 +1,28 @@
-import Image from 'next/image'
-import { Database } from '@/lib/database.types'
+import Image from "next/image";
+import { Database } from "@/lib/database.types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
-type Movie = Database['public']['Tables']['movies']['Row']
+type Movie = Database["public"]["Tables"]["movies"]["Row"];
 
 interface MovieCardProps {
-  movie: Movie
-  className?: string
+  movie: Movie;
+  className?: string;
 }
 
-export default function MovieCard({ movie, className = '' }: MovieCardProps) {
+export default function MovieCard({ movie, className = "" }: MovieCardProps) {
   const formatYear = (year: number | null) => {
-    return year ? year.toString() : 'Unknown'
-  }
+    return year ? year.toString() : "Unknown";
+  };
 
   const formatRating = (rating: number | null) => {
-    if (!rating) return 'No rating'
-    return `${rating}/10`
-  }
+    if (!rating) return "No rating";
+    return `${rating}/10`;
+  };
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
+    <Card className={`overflow-hidden ${className}`}>
       {movie.poster_url && (
         <div className="relative h-64 w-full">
           <Image
@@ -31,51 +34,52 @@ export default function MovieCard({ movie, className = '' }: MovieCardProps) {
           />
         </div>
       )}
-      
-      <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          {movie.title}
-        </h2>
-        
+
+      <CardHeader>
+        <CardTitle className="text-2xl">{movie.title}</CardTitle>
         {movie.description && (
-          <p className="text-gray-600 mb-4 line-clamp-3">
+          <p className="text-muted-foreground line-clamp-3">
             {movie.description}
           </p>
         )}
-        
-        <div className="space-y-2">
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-4 text-sm">
           {movie.director && (
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-gray-500 w-20">Director:</span>
-              <span className="text-sm text-gray-900">{movie.director}</span>
+            <div>
+              <span className="font-medium text-muted-foreground">
+                Director:
+              </span>
+              <p className="mt-1">{movie.director}</p>
             </div>
           )}
-          
+
           {movie.genre && (
-            <div className="flex items-center">
-              <span className="text-sm font-medium text-gray-500 w-20">Genre:</span>
-              <span className="text-sm text-gray-900">{movie.genre}</span>
+            <div>
+              <span className="font-medium text-muted-foreground">Genre:</span>
+              <p className="mt-1">{movie.genre}</p>
             </div>
           )}
-          
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-500 w-20">Year:</span>
-            <span className="text-sm text-gray-900">{formatYear(movie.release_year)}</span>
+
+          <div>
+            <span className="font-medium text-muted-foreground">Year:</span>
+            <p className="mt-1">{formatYear(movie.release_year)}</p>
           </div>
-          
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-500 w-20">Rating:</span>
-            <span className="text-sm text-gray-900">{formatRating(movie.rating)}</span>
-          </div>
-        </div>
-        
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>ID: {movie.id}</span>
-            <span>Added: {new Date(movie.created_at).toLocaleDateString()}</span>
+
+          <div>
+            <span className="font-medium text-muted-foreground">Rating:</span>
+            <p className="mt-1">{formatRating(movie.rating)}</p>
           </div>
         </div>
-      </div>
-    </div>
-  )
+
+        <Separator />
+
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>ID: {movie.id}</span>
+          <span>Added: {new Date(movie.created_at).toLocaleDateString()}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }

@@ -1,4 +1,15 @@
 import { Database } from "@/lib/database.types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 type Screen = Database["public"]["Tables"]["screens"]["Row"];
 
@@ -7,7 +18,10 @@ interface ScreensTableProps {
   className?: string;
 }
 
-export default function ScreensTable({ screens, className = "" }: ScreensTableProps) {
+export default function ScreensTable({
+  screens,
+  className = "",
+}: ScreensTableProps) {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
     try {
@@ -22,110 +36,109 @@ export default function ScreensTable({ screens, className = "" }: ScreensTablePr
     return seats.toLocaleString();
   };
 
-  const getDimensionLabel = (dimension: string | null) => {
-    if (!dimension) return "N/A";
-    return dimension.toUpperCase();
+  const getDimensionBadge = (dimension: string | null) => {
+    if (!dimension) return <Badge variant="secondary">N/A</Badge>;
+    return (
+      <Badge variant={dimension === "3D" ? "default" : "secondary"}>
+        {dimension}
+      </Badge>
+    );
   };
 
-  const getScreenTypeLabel = (screenType: string | null) => {
-    if (!screenType) return "N/A";
-    return screenType.charAt(0).toUpperCase() + screenType.slice(1);
+  const getScreenTypeBadge = (screenType: string | null) => {
+    if (!screenType) return <Badge variant="outline">N/A</Badge>;
+    return (
+      <Badge variant={screenType === "dome" ? "default" : "outline"}>
+        {screenType.charAt(0).toUpperCase() + screenType.slice(1)}
+      </Badge>
+    );
   };
 
   if (screens.length === 0) {
     return (
-      <div className={`text-center py-8 ${className}`}>
-        <p className="text-gray-500 dark:text-gray-400">No screens found.</p>
-      </div>
+      <Card className={className}>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="text-muted-foreground text-lg mb-2">📽️</div>
+            <p className="text-muted-foreground">No screens found.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={`overflow-x-auto ${className}`}>
-      <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-        <thead className="bg-gray-50 dark:bg-gray-700">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Country
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              City
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              State
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Organization
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Projection
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Format
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              2D/3D
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Flat/Dome
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Seats
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Screen Size
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Opened Date
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600">
-              Screen Type
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-          {screens.map((screen) => (
-            <tr key={screen.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.country || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.city || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.state || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.organization || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.projection || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.format || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {getDimensionLabel(screen.dimension)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {getScreenTypeLabel(screen.screen_type)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {formatSeats(screen.seats)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.screen_size || "N/A"}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {formatDate(screen.opened_date)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-600">
-                {screen.screen_type || "N/A"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Card className={className}>
+      {/* <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span>Screen Database</span>
+          <Badge variant="secondary">{screens.length} screens</Badge>
+        </CardTitle>
+        <Separator />
+      </CardHeader> */}
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]">Location</TableHead>
+                <TableHead className="w-[150px]">Organization</TableHead>
+                <TableHead className="w-[120px]">Projection</TableHead>
+                <TableHead className="w-[80px]">Format</TableHead>
+                <TableHead className="w-[80px]">Dimension</TableHead>
+                <TableHead className="w-[100px]">Type</TableHead>
+                <TableHead className="w-[80px] text-right">Seats</TableHead>
+                <TableHead className="w-[120px]">Screen Size</TableHead>
+                <TableHead className="w-[100px]">Opened</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {screens.map((screen) => (
+                <TableRow key={screen.id} className="hover:bg-muted/50">
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="font-medium">
+                        {screen.country || "N/A"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {screen.city}, {screen.state || "N/A"}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">
+                      {screen.organization || "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium">
+                      {screen.projection || "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{screen.format || "N/A"}</Badge>
+                  </TableCell>
+                  <TableCell>{getDimensionBadge(screen.dimension)}</TableCell>
+                  <TableCell>
+                    {getScreenTypeBadge(screen.screen_type)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {formatSeats(screen.seats)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">{screen.screen_size || "N/A"}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(screen.opened_date)}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

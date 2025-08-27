@@ -5,6 +5,10 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ScreensDisplay from "@/components/ScreensDisplay";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 async function MovieDisplay() {
   try {
@@ -12,38 +16,40 @@ async function MovieDisplay() {
 
     if (!movie) {
       return (
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to Filmy
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Your movie database is empty. Add some movies to get started!
-          </p>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md mx-auto">
-            <h3 className="text-lg font-medium text-yellow-800 mb-2">
-              No Movies Found
-            </h3>
-            <p className="text-yellow-700">
-              Please add some movies to your database to see them displayed
-              here.
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className="text-6xl mb-4">🎬</div>
+            <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground text-lg">
+              Your movie database is empty. Add some movies to get started!
             </p>
-          </div>
-        </div>
+            <div className="bg-muted/50 rounded-lg p-6">
+              <h3 className="font-semibold text-lg mb-2">No Movies Found</h3>
+              <p className="text-muted-foreground">
+                Please add some movies to your database to see them displayed
+                here.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       );
     }
 
     return (
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to Filmy
-        </h1>
-        <p className="text-lg text-gray-600 mb-8">
-          Here's a movie from your collection:
-        </p>
-        <div className="max-w-md mx-auto">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader className="text-center">
+          <div className="text-6xl mb-4">🎬</div>
+          <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
+          <p className="text-muted-foreground">
+            Here's a movie from your collection:
+          </p>
+        </CardHeader>
+        <CardContent>
           <MovieCard movie={movie} />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   } catch (error) {
     console.error("Error fetching movie:", error);
@@ -51,29 +57,47 @@ async function MovieDisplay() {
   }
 }
 
+function LoadingSkeleton() {
+  return (
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader className="text-center">
+        <div className="text-6xl mb-4">🎬</div>
+        <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
+        <p className="text-muted-foreground">
+          Loading your movie collection...
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Skeleton className="h-64 w-full rounded-lg" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Theme Toggle */}
-        <div className="flex justify-end mb-8">
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Filmy</h1>
+            <p className="text-muted-foreground">
+              Your movie and screen database
+            </p>
+          </div>
           <ThemeToggle />
         </div>
 
+        <Separator />
+
+        {/* Content */}
         <ErrorBoundary>
-          <Suspense
-            fallback={
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                  Welcome to Filmy
-                </h1>
-                <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                  Loading screens information...
-                </p>
-                <LoadingSpinner size="lg" />
-              </div>
-            }
-          >
+          <Suspense fallback={<LoadingSkeleton />}>
             <ScreensDisplay />
           </Suspense>
         </ErrorBoundary>
