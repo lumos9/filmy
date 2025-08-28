@@ -105,7 +105,7 @@ export const columns: ColumnDef<Screen>[] = [
       const country = String(row.original.country || "");
       const locationLine = [city, state, country].filter(Boolean).join(", ");
       return (
-        <div>
+        <div className="flex flex-col items-start justify-center">
           <div className="font-medium">{org}</div>
           <div className="text-xs text-muted-foreground">
             {locationLine || "N/A"}

@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import * as React from "react";
+import NavBar from "@/components/NavBar";
+import dynamic from "next/dynamic";
+// const NavBar = dynamic(() => import("@/components/NavBar"));
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +38,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {/* Common NavBar for all pages */}
+          <div className="min-h-screen flex flex-col">
+            <NavBar />
+            <main className="flex flex-1">{children}</main>
+          </div>
         </ThemeProvider>
       </body>
     </html>

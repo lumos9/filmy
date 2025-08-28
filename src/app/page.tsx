@@ -5,6 +5,10 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ScreensDisplay from "@/components/ScreensDisplay";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -57,59 +61,10 @@ async function MovieDisplay() {
   }
 }
 
-function LoadingSkeleton() {
+export default async function Home() {
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader className="text-center">
-        <div className="text-6xl mb-4">🎬</div>
-        <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
-        <p className="text-muted-foreground">
-          Loading your movie collection...
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Skeleton className="h-64 w-full rounded-lg" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = (await searchParams) ?? {};
-  const page = Number(params.page ?? 1);
-  const pageSize = Number(params.pageSize ?? 25);
-
-  return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Filmy</h1>
-            <p className="text-muted-foreground">
-              Your movie and screen database
-            </p>
-          </div>
-          <ThemeToggle />
-        </div>
-
-        <Separator />
-
-        {/* Content */}
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingSkeleton />}>
-            <ScreensDisplay />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
+    <div className="w-full flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <h1 className="text-3xl font-bold mb-4">Home</h1>
     </div>
   );
 }
