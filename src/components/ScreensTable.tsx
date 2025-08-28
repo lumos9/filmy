@@ -12,6 +12,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 type Screen = Database["public"]["Tables"]["screens"]["Row"];
 
@@ -220,20 +226,31 @@ export default function ScreensTable({
                   <ChevronDown className="inline ml-1 w-3 h-3" />
                 ))}
               <div className="mt-1">
-                <select
-                  className="text-xs border rounded px-1 py-0.5"
-                  value={filters.organization || ""}
-                  onChange={(e) => handleFilter("organization", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {getUniqueValues("organization").map((v) =>
-                    typeof v === "string" ? (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ) : null
-                  )}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs border rounded px-1 py-0.5 min-w-[60px] bg-background">
+                      {filters.organization || "All"}
+                      <ChevronDown className="inline w-3 h-3 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem
+                      onClick={() => handleFilter("organization", "")}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {getUniqueValues("organization").map((v) =>
+                      typeof v === "string" ? (
+                        <DropdownMenuItem
+                          key={v}
+                          onClick={() => handleFilter("organization", v)}
+                        >
+                          {v}
+                        </DropdownMenuItem>
+                      ) : null
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableHead>
             {/* Projection */}
@@ -249,20 +266,31 @@ export default function ScreensTable({
                   <ChevronDown className="inline ml-1 w-3 h-3" />
                 ))}
               <div className="mt-1">
-                <select
-                  className="text-xs border rounded px-1 py-0.5"
-                  value={filters.projections || ""}
-                  onChange={(e) => handleFilter("projections", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {getUniqueValues("projections").map((v) =>
-                    typeof v === "string" ? (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ) : null
-                  )}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs border rounded px-1 py-0.5 min-w-[60px] bg-background">
+                      {filters.projections || "All"}
+                      <ChevronDown className="inline w-3 h-3 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem
+                      onClick={() => handleFilter("projections", "")}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {getUniqueValues("projections").map((v) =>
+                      typeof v === "string" ? (
+                        <DropdownMenuItem
+                          key={v}
+                          onClick={() => handleFilter("projections", v)}
+                        >
+                          {v}
+                        </DropdownMenuItem>
+                      ) : null
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableHead>
             {/* Format (array) */}
@@ -278,20 +306,31 @@ export default function ScreensTable({
                   <ChevronDown className="inline ml-1 w-3 h-3" />
                 ))}
               <div className="mt-1">
-                <select
-                  className="text-xs border rounded px-1 py-0.5"
-                  value={filters.formats || ""}
-                  onChange={(e) => handleFilter("formats", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {getUniqueValues("formats").map((v) =>
-                    typeof v === "string" ? (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ) : null
-                  )}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs border rounded px-1 py-0.5 min-w-[60px] bg-background">
+                      {filters.formats || "All"}
+                      <ChevronDown className="inline w-3 h-3 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem
+                      onClick={() => handleFilter("formats", "")}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {getUniqueValues("formats").map((v) =>
+                      typeof v === "string" ? (
+                        <DropdownMenuItem
+                          key={v}
+                          onClick={() => handleFilter("formats", v)}
+                        >
+                          {v}
+                        </DropdownMenuItem>
+                      ) : null
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableHead>
             {/* Dimension (array) */}
@@ -307,20 +346,31 @@ export default function ScreensTable({
                   <ChevronDown className="inline ml-1 w-3 h-3" />
                 ))}
               <div className="mt-1">
-                <select
-                  className="text-xs border rounded px-1 py-0.5"
-                  value={filters.dimensions || ""}
-                  onChange={(e) => handleFilter("dimensions", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {getUniqueValues("dimensions").map((v) =>
-                    typeof v === "string" ? (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ) : null
-                  )}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs border rounded px-1 py-0.5 min-w-[60px] bg-background">
+                      {filters.dimensions || "All"}
+                      <ChevronDown className="inline w-3 h-3 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem
+                      onClick={() => handleFilter("dimensions", "")}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {getUniqueValues("dimensions").map((v) =>
+                      typeof v === "string" ? (
+                        <DropdownMenuItem
+                          key={v}
+                          onClick={() => handleFilter("dimensions", v)}
+                        >
+                          {v}
+                        </DropdownMenuItem>
+                      ) : null
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableHead>
             {/* Type */}
@@ -336,20 +386,31 @@ export default function ScreensTable({
                   <ChevronDown className="inline ml-1 w-3 h-3" />
                 ))}
               <div className="mt-1">
-                <select
-                  className="text-xs border rounded px-1 py-0.5"
-                  value={filters.screen_type || ""}
-                  onChange={(e) => handleFilter("screen_type", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {getUniqueValues("screen_type").map((v) =>
-                    typeof v === "string" ? (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ) : null
-                  )}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs border rounded px-1 py-0.5 min-w-[60px] bg-background">
+                      {filters.screen_type || "All"}
+                      <ChevronDown className="inline w-3 h-3 ml-1" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem
+                      onClick={() => handleFilter("screen_type", "")}
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {getUniqueValues("screen_type").map((v) =>
+                      typeof v === "string" ? (
+                        <DropdownMenuItem
+                          key={v}
+                          onClick={() => handleFilter("screen_type", v)}
+                        >
+                          {v}
+                        </DropdownMenuItem>
+                      ) : null
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </TableHead>
             {/* Seats */}

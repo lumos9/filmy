@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ScreensService } from "@/lib/screens.service";
-import ScreensTable from "./ScreensTable";
+import { ScreensTableV2 } from "./ScreensTableV2";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 export default function ScreensDisplay() {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  // const [page, setPage] = useState(1);
+  // const [pageSize, setPageSize] = useState(25);
   const [screens, setScreens] = useState<
     Awaited<ReturnType<typeof ScreensService.getAllScreens>>["screens"]
   >([]);
@@ -33,68 +33,74 @@ export default function ScreensDisplay() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-    setError(null);
+  useEffect(
+    () => {
+      let isMounted = true;
+      setIsLoading(true);
+      setError(null);
 
-    ScreensService.getAllScreens(page, pageSize)
-      .then(({ screens, totalCount }) => {
-        if (!isMounted) return;
-        setScreens(screens);
-        setTotalCount(totalCount || 0);
-      })
-      .catch((e) => {
-        if (!isMounted) return;
-        setError(e?.message || "Failed to load screens");
-      })
-      .finally(() => {
-        if (!isMounted) return;
-        setIsLoading(false);
-      });
+      ScreensService.getAllScreens()
+        .then(({ screens, totalCount }) => {
+          if (!isMounted) return;
+          setScreens(screens);
+          console.log("Total screens fetched:", totalCount);
+          setTotalCount(totalCount || 0);
+        })
+        .catch((e) => {
+          if (!isMounted) return;
+          setError(e?.message || "Failed to load screens");
+        })
+        .finally(() => {
+          if (!isMounted) return;
+          setIsLoading(false);
+        });
 
-    return () => {
-      isMounted = false;
-    };
-  }, [page, pageSize]);
-
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil((totalCount || 0) / pageSize)),
-    [totalCount, pageSize]
-  );
-  const currentPage = useMemo(
-    () => Math.min(Math.max(1, page), totalPages),
-    [page, totalPages]
+      return () => {
+        isMounted = false;
+      };
+    },
+    [
+      /* page, pageSize */
+    ]
   );
 
-  const perPageOptions = [10, 25, 50, 100];
+  // const totalPages = useMemo(
+  //   () => Math.max(1, Math.ceil((totalCount || 0) / pageSize)),
+  //   [totalCount, pageSize]
+  // );
+  // const currentPage = useMemo(
+  //   () => Math.min(Math.max(1, page), totalPages),
+  //   [page, totalPages]
+  // );
 
-  const numberedWithEllipsis = useMemo(() => {
-    const list: (number | "ellipsis")[] = [];
-    const add = (n: number) => {
-      if (n >= 1 && n <= totalPages && !list.includes(n)) list.push(n);
-    };
-    add(1);
-    add(2);
-    add(currentPage - 1);
-    add(currentPage);
-    add(currentPage + 1);
-    add(totalPages - 1);
-    add(totalPages);
-    const uniqueSorted = [
-      ...new Set(list.filter((v) => v !== "ellipsis")),
-    ].sort((a, b) => (a as number) - (b as number));
-    const withEllipsis: (number | "ellipsis")[] = [];
-    for (let i = 0; i < uniqueSorted.length; i++) {
-      const n = uniqueSorted[i] as number;
-      const prev = uniqueSorted[i - 1] as number | undefined;
-      if (prev !== undefined && n - prev > 1) {
-        withEllipsis.push("ellipsis");
-      }
-      withEllipsis.push(n);
-    }
-    return withEllipsis;
-  }, [currentPage, totalPages]);
+  // const perPageOptions = [10, 25, 50, 100];
+
+  // const numberedWithEllipsis = useMemo(() => {
+  //   const list: (number | "ellipsis")[] = [];
+  //   const add = (n: number) => {
+  //     if (n >= 1 && n <= totalPages && !list.includes(n)) list.push(n);
+  //   };
+  //   add(1);
+  //   add(2);
+  //   add(currentPage - 1);
+  //   add(currentPage);
+  //   add(currentPage + 1);
+  //   add(totalPages - 1);
+  //   add(totalPages);
+  //   const uniqueSorted = [
+  //     ...new Set(list.filter((v) => v !== "ellipsis")),
+  //   ].sort((a, b) => (a as number) - (b as number));
+  //   const withEllipsis: (number | "ellipsis")[] = [];
+  //   for (let i = 0; i < uniqueSorted.length; i++) {
+  //     const n = uniqueSorted[i] as number;
+  //     const prev = uniqueSorted[i - 1] as number | undefined;
+  //     if (prev !== undefined && n - prev > 1) {
+  //       withEllipsis.push("ellipsis");
+  //     }
+  //     withEllipsis.push(n);
+  //   }
+  //   return withEllipsis;
+  // }, [currentPage, totalPages]);
 
   if (error) {
     return (
@@ -104,7 +110,7 @@ export default function ScreensDisplay() {
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-destructive">{error}</p>
-          <Button onClick={() => setPage(1)}>Retry</Button>
+          {/* <Button onClick={() => setPage(1)}>Retry</Button> */}
         </CardContent>
       </Card>
     );
@@ -133,52 +139,52 @@ export default function ScreensDisplay() {
     );
   }
 
-  const PaginationNav = (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            href="#"
-            aria-disabled={currentPage === 1}
-            onClick={(e) => {
-              e.preventDefault();
-              if (currentPage > 1) setPage(currentPage - 1);
-            }}
-          />
-        </PaginationItem>
-        {numberedWithEllipsis.map((item, idx) =>
-          item === "ellipsis" ? (
-            <PaginationItem key={`e-${idx}`}>
-              <PaginationEllipsis />
-            </PaginationItem>
-          ) : (
-            <PaginationItem key={item}>
-              <PaginationLink
-                href="#"
-                isActive={item === currentPage}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setPage(item as number);
-                }}
-              >
-                {item}
-              </PaginationLink>
-            </PaginationItem>
-          )
-        )}
-        <PaginationItem>
-          <PaginationNext
-            href="#"
-            aria-disabled={currentPage >= totalPages}
-            onClick={(e) => {
-              e.preventDefault();
-              if (currentPage < totalPages) setPage(currentPage + 1);
-            }}
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
-  );
+  // const PaginationNav = (
+  //   <Pagination>
+  //     <PaginationContent>
+  //       <PaginationItem>
+  //         <PaginationPrevious
+  //           href="#"
+  //           aria-disabled={currentPage === 1}
+  //           onClick={(e) => {
+  //             e.preventDefault();
+  //             if (currentPage > 1) setPage(currentPage - 1);
+  //           }}
+  //         />
+  //       </PaginationItem>
+  //       {numberedWithEllipsis.map((item, idx) =>
+  //         item === "ellipsis" ? (
+  //           <PaginationItem key={`e-${idx}`}>
+  //             <PaginationEllipsis />
+  //           </PaginationItem>
+  //         ) : (
+  //           <PaginationItem key={item}>
+  //             <PaginationLink
+  //               href="#"
+  //               isActive={item === currentPage}
+  //               onClick={(e) => {
+  //                 e.preventDefault();
+  //                 setPage(item as number);
+  //               }}
+  //             >
+  //               {item}
+  //             </PaginationLink>
+  //           </PaginationItem>
+  //         )
+  //       )}
+  //       <PaginationItem>
+  //         <PaginationNext
+  //           href="#"
+  //           aria-disabled={currentPage >= totalPages}
+  //           onClick={(e) => {
+  //             e.preventDefault();
+  //             if (currentPage < totalPages) setPage(currentPage + 1);
+  //           }}
+  //         />
+  //       </PaginationItem>
+  //     </PaginationContent>
+  //   </Pagination>
+  // );
 
   return (
     <div className="space-y-6">
@@ -214,12 +220,12 @@ export default function ScreensDisplay() {
             </Button>
           ))}
         </div>*/}
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Per page:</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="outline">
-                {pageSize} {/* currently selected page size */}
+                {pageSize}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -236,11 +242,11 @@ export default function ScreensDisplay() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </div> */}
       </div>
 
       {/* Top pagination */}
-      {PaginationNav}
+      {/* {PaginationNav} */}
       <Separator />
 
       {isLoading ? (
@@ -252,11 +258,12 @@ export default function ScreensDisplay() {
           <div className="mt-6 h-64 w-full bg-muted rounded" />
         </Card>
       ) : (
-        <ScreensTable screens={screens} />
+        // <ScreensTableV2 data={screens} />
+        <ScreensTableV2 screenData={screens} />
       )}
 
       {/* Bottom pagination */}
-      {PaginationNav}
+      {/* {PaginationNav} */}
     </div>
   );
 }

@@ -7,9 +7,58 @@ type ScreenUpdate = Database["public"]["Tables"]["screens"]["Update"];
 
 export class ScreensService {
   /**
+   * Get all screens (no pagination)
+   */
+  static async getAllScreens() {
+    try {
+      const supabase = getSupabaseClient();
+      const batchSize = 1000;
+      let from = 0;
+      let to = batchSize - 1;
+      let allData: Screen[] = [];
+      let totalCount = 0;
+      let done = false;
+
+      while (!done) {
+        const { data, error, count } = await supabase
+          .from("screens")
+          .select("*", { count: "exact" })
+          .order("created_at", { ascending: false })
+          .range(from, to);
+
+        if (error) {
+          throw new Error(`Failed to fetch screens: ${error.message}`);
+        }
+
+        if (data) {
+          allData = allData.concat(data);
+        }
+        if (count !== null && count !== undefined) {
+          totalCount = count;
+        }
+
+        if (!data || data.length < batchSize) {
+          done = true;
+        } else {
+          from += batchSize;
+          to += batchSize;
+        }
+      }
+
+      return {
+        screens: allData,
+        totalCount,
+      };
+    } catch (error) {
+      console.error("Error fetching all screens:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Get all screens with optional pagination
    */
-  static async getAllScreens(page = 1, limit = 50) {
+  static async getAllScreensByPageSize(page = 1, limit = 50) {
     try {
       const from = (page - 1) * limit;
       const to = from + limit - 1;
