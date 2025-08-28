@@ -1,13 +1,17 @@
 "use client";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useState } from "react";
+// import { Geist } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Separator } from "@/components/ui/separator";
 
 export default function NavBar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
   const links = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
@@ -16,20 +20,25 @@ export default function NavBar() {
     { href: "/donate", label: "Donate" },
     { href: "/contact", label: "Contact" },
   ];
+
   return (
     <header className="bg-background sticky top-0 z-30 border-b">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {/* Burger menu for mobile */}
           <div className="md:hidden">
-            <Sheet>
+            <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Open menu">
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-8 w-8" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-64">
-                <nav className="flex flex-col gap-2 p-6">
+                {/* Mobile menu header with same height and font as desktop */}
+                <div className="flex justify-start items-center px-6 h-16 border-b">
+                  <span className="text-3xl font-bold">Filmy</span>
+                </div>
+                <nav className="flex flex-col gap-2 px-6">
                   {links.map((link) => (
                     <Link
                       key={link.href}
@@ -41,6 +50,7 @@ export default function NavBar() {
                             : "hover:bg-accent hover:text-accent-foreground"
                         }
                       `}
+                      onClick={() => setOpen(false)}
                     >
                       {link.label}
                     </Link>
