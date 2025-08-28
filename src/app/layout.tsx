@@ -38,8 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Common NavBar for all pages */}
-          <div className="min-h-screen flex flex-col">
+          <div className="flex flex-col min-h-screen">
             <NavBar />
             {/* Top progress bar below NavBar */}
             <div className="relative z-50">

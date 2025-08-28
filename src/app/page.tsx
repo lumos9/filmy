@@ -63,7 +63,7 @@ async function MovieDisplay() {
 
 export default async function Home() {
   return (
-    <div className="w-full flex flex-col items-center justify-center min-h-[60vh] text-center">
+    <div className="w-full flex flex-col items-center justify-center text-center">
       <h1 className="text-3xl font-bold mb-4">Home</h1>
     </div>
   );

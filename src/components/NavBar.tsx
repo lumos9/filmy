@@ -1,5 +1,10 @@
 "use client";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useState } from "react";
 // import { Geist } from "next/font/google";
 import { Button } from "@/components/ui/button";
@@ -30,7 +35,7 @@ export default function NavBar() {
   ];
 
   return (
-    <header className="bg-background sticky top-0 z-30 border-b">
+    <header className="bg-background sticky top-0 z-30 border-b h-16">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {/* Burger menu for mobile */}
@@ -42,6 +47,24 @@ export default function NavBar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 px-6">
+                {/* Visually hidden DialogTitle for accessibility */}
+                <SheetTitle asChild>
+                  <span
+                    style={{
+                      position: "absolute",
+                      width: 1,
+                      height: 1,
+                      padding: 0,
+                      margin: -1,
+                      overflow: "hidden",
+                      clip: "rect(0,0,0,0)",
+                      whiteSpace: "nowrap",
+                      border: 0,
+                    }}
+                  >
+                    Navigation Menu
+                  </span>
+                </SheetTitle>
                 {/* Mobile menu header with same height and font as desktop */}
                 <div className="flex justify-start items-center h-16 border-b">
                   <span className="text-3xl font-bold">Filmy</span>
