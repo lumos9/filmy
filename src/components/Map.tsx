@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
+import { createRoot } from "react-dom/client";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export interface GpsPoint {
   id: string;
@@ -13,16 +15,15 @@ export interface GpsPoint {
 
 const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null); // Create a ref for the map instance
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current || !mapRef.current) return; // Ensure container is available
-
+    if (!mapContainer.current || !mapRef.current) return;
     mapboxgl.accessToken =
       process.env.NEXT_PUBLIC_MAPBOX_DEFAULT_PUBLIC_TOKEN || "";
-
-    // Initialize the map only if it hasn't been initialized yet
     if (!mapRef.current) {
+      // do nothing, handled in mount effect
     } else {
       // Update the source data when gpsPoints changes
       if (mapRef.current.getSource("points")) {
@@ -35,6 +36,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               coordinates: point.coordinates,
             },
             properties: {
+              id: point.id,
               name: point.metadata.name,
               description: point.metadata.description,
             },
@@ -46,23 +48,16 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
   useEffect(() => {
     if (!mapContainer.current) return;
-
-    console.log("mounting");
-
     mapboxgl.accessToken =
       process.env.NEXT_PUBLIC_MAPBOX_DEFAULT_PUBLIC_TOKEN || "";
-
-    // Initialize the map only if it hasn't been initialized yet
     if (!mapRef.current) {
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/dark-v10",
-        center: gpsPoints[0]?.coordinates || [0, 0], // Default center
+        center: gpsPoints[0]?.coordinates || [0, 0],
         zoom: 3,
       });
-
-      // Add source and layer when the style has loaded
-      (mapRef.current as mapboxgl.Map)?.once("style.load", () => {
+      mapRef.current.once("style.load", () => {
         mapRef.current?.addSource("points", {
           type: "geojson",
           data: {
@@ -74,13 +69,13 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 coordinates: point.coordinates,
               },
               properties: {
+                id: point.id,
                 name: point.metadata.name,
                 description: point.metadata.description,
               },
             })),
           },
         });
-
         mapRef.current?.addLayer({
           id: "points",
           type: "circle",
@@ -90,23 +85,101 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             "circle-color": "red",
           },
         });
+        // Add click handler for points
+        // --- React popup rendering ---
+        function MapPopupCard({
+          point,
+          onClose,
+        }: {
+          point: GpsPoint;
+          onClose: () => void;
+        }) {
+          return (
+            <div className="relative max-w-xs rounded-lg border bg-card p-4 shadow-md text-left pr-10">
+              <button
+                onClick={onClose}
+                className="cursor-pointer absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-xl"
+                aria-label="Close popup"
+                type="button"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+              <div className="font-bold flex flex-wrap">
+                {point.metadata.name}
+              </div>
+              <div className="text-xs">{point.metadata.description}</div>
+            </div>
+          );
+        }
+        mapRef.current?.on("click", "points", (e) => {
+          const feature = e.features && e.features[0];
+          if (feature && feature.properties) {
+            const id = feature.properties.id;
+            const found = gpsPoints.find((p) => p.id === id);
+            if (found) {
+              if (popupRef.current) {
+                popupRef.current.remove();
+                popupRef.current = null;
+              }
+              const popupNode = document.createElement("div");
+              // Custom close handler
+              const handleClose = () => {
+                if (popupRef.current) {
+                  popupRef.current.remove();
+                  popupRef.current = null;
+                }
+              };
+              createRoot(popupNode).render(
+                <MapPopupCard point={found} onClose={handleClose} />
+              );
+              popupRef.current = new mapboxgl.Popup({
+                closeOnClick: true,
+                offset: 12,
+                closeButton: false, // Hide Mapbox default close button
+              })
+                .setLngLat(found.coordinates)
+                .setDOMContent(popupNode)
+                .addTo(mapRef.current!);
+            }
+          }
+        });
+        // Change cursor on hover
+        mapRef.current?.on("mouseenter", "points", () => {
+          mapRef.current?.getCanvas().style.setProperty("cursor", "pointer");
+        });
+        mapRef.current?.on("mouseleave", "points", () => {
+          mapRef.current?.getCanvas().style.setProperty("cursor", "");
+        });
       });
     }
+    // Cleanup on unmount
     return () => {
-      // Clean up the map instance on unmount
-      if (mapRef.current) {
-        mapRef.current.remove(); // Remove the map instance
-        mapRef.current = null; // Clear the map reference
-      }
-      console.log("unmounting");
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
-  }, []); // <-- Empty dependency array to run only on mount
+  }, [gpsPoints]);
 
   return (
-    <div
-      className="w-full h-[400px] md:h-[700px] rounded-lg"
-      ref={mapContainer}
-    />
+    <>
+      <style>{`
+        .mapboxgl-popup-content {
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
+          padding: 0 !important;
+        }
+        .mapboxgl-popup-tip {
+          display: none !important;
+        }
+        .mapboxgl-popup-close-button {
+          display: none !important;
+        }
+      `}</style>
+      <div
+        className="w-full h-[400px] md:h-[700px] rounded-lg"
+        ref={mapContainer}
+      />
+    </>
   );
 };
 
