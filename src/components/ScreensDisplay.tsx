@@ -151,6 +151,9 @@ export default function ScreensDisplay() {
   const [screens, setScreens] = useState<
     Awaited<ReturnType<typeof ScreensService.getAllScreens>>["screens"]
   >([]);
+  const [screensWithValidCoords, setScreensWithValidCoords] = useState<
+    GpsPoint[]
+  >([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -166,7 +169,33 @@ export default function ScreensDisplay() {
         .then(({ screens, totalCount }) => {
           if (!isMounted) return;
           setScreens(screens);
-          console.log("Total screens fetched:", totalCount);
+          const screensWithCoords = screens
+            .filter(
+              (screen) =>
+                typeof screen.latitude === "number" &&
+                typeof screen.longitude === "number"
+            )
+            .map((screen) => ({
+              id: screen.id,
+              coordinates: [
+                screen.longitude as number,
+                screen.latitude as number,
+              ] as [number, number],
+              metadata: {
+                name: screen.organization || "Unknown",
+                description: [screen.city, screen.state, screen.country]
+                  .filter(Boolean)
+                  .join(", "),
+              },
+            }));
+          setScreensWithValidCoords(screensWithCoords);
+
+          console.log("screens with valid cords fetched:", screensWithCoords);
+          console.log(
+            "screens with valid cords fetched count:",
+            screensWithCoords.length
+          );
+          //console.log("screens with fake data:", theaters);
           setTotalCount(totalCount || 0);
         })
         .catch((e) => {
@@ -191,7 +220,7 @@ export default function ScreensDisplay() {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Screen Database</CardTitle>
+          <CardTitle className="text-2xl">Screens</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-destructive">{error}</p>
@@ -206,17 +235,13 @@ export default function ScreensDisplay() {
       <Card className="max-w-screen mx-auto">
         <CardHeader className="text-center">
           <div className="text-6xl mb-4">📽️</div>
-          <CardTitle className="text-2xl">Screen Database</CardTitle>
+          <CardTitle className="text-2xl">Screens</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          <p className="text-muted-foreground text-lg">
-            Your screen database is empty. Add some screens to get started!
-          </p>
           <div className="bg-muted/50 rounded-lg p-6">
             <h3 className="font-semibold text-lg mb-2">No Screens Found</h3>
             <p className="text-muted-foreground">
-              Please add some screens to your database to see them displayed
-              here.
+              No screens available at the moment. Please check back later!
             </p>
           </div>
         </CardContent>
@@ -227,12 +252,10 @@ export default function ScreensDisplay() {
   return (
     <div className="w-full md:container ms:mx-auto flex flex-col gap-4">
       <div className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-semibold">Screen Database</h1>
+        <h1 className="text-2xl font-semibold">Screens</h1>
         <div className="flex items-center justify-center gap-2 text-muted-foreground mt-1">
           <span className="text-center">
-            {isLoading
-              ? "Loading screens information..."
-              : `Showing ${screens.length} of ${totalCount} screens`}
+            {isLoading && "Loading screens information..."}
           </span>
         </div>
       </div>
@@ -267,7 +290,7 @@ export default function ScreensDisplay() {
               <div className="mt-6 h-64 w-full bg-muted rounded" />
             </Card>
           ) : (
-            <Map gpsPoints={theaters} />
+            <Map gpsPoints={screensWithValidCoords} />
           )}
         </TabsContent>
         <TabsContent value="list" className="w-full mt-4">
