@@ -55,6 +55,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/dark-v10",
         center: gpsPoints[0]?.coordinates || [0, 0],
+        attributionControl: false,
         zoom: 3,
       });
       mapRef.current.once("style.load", () => {
@@ -173,6 +174,9 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         }
         .mapboxgl-popup-close-button {
           display: none !important;
+        }
+        .mapboxgl-ctrl-logo {
+          display: none !important; /* 🚫 hides Mapbox logo */
         }
       `}</style>
       <div

@@ -192,29 +192,25 @@ export function PayPalDonateButton() {
       {/* Trust Indicators */}
       <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
-          <Shield className="h-4 w-4 text-primary" />
+          <Shield className="h-4 w-4 text-blue-500 dark:text-blue-400" />
           <span>Secure</span>
         </div>
         <div className="flex items-center gap-1">
-          <Lock className="h-4 w-4 text-primary" />
+          <Lock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>Anonymous</span>
         </div>
         <div className="flex items-center gap-1">
-          <CheckCircle className="h-4 w-4 text-primary" />
+          <CheckCircle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
           <span>Trusted</span>
         </div>
       </div>
 
       <Card className="shadow-lg border-0 bg-card">
-        <CardHeader className="text-center pb-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Heart className="h-5 w-5 text-accent" />
+        <CardHeader className="text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Heart className="h-5 w-5 text-red-500" />
             <CardTitle className="text-xl font-bold">Make a Donation</CardTitle>
           </div>
-          <CardDescription className="text-balance">
-            Your contribution helps us continue our mission. All donations are
-            completely anonymous and secure.
-          </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -291,10 +287,7 @@ export function PayPalDonateButton() {
           {/* Security Notice */}
           <div className="bg-muted/50 rounded-lg p-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Badge
-                variant="secondary"
-                className="bg-accent/10 text-accent border-accent/20"
-              >
+              <Badge variant="secondary">
                 <Lock className="h-3 w-3 mr-1" />
                 100% Anonymous
               </Badge>

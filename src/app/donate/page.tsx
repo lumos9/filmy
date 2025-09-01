@@ -8,7 +8,7 @@ export default function DonatePage() {
           <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">
             Support Our Mission
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-balance">
             Your generous donation helps us continue making a positive impact.
             Every contribution, no matter the size, makes a difference.
           </p>
