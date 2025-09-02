@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-// Helper to send email to a list of recipients
+import { Resend } from "resend";
+
+// Helper to send email to a list of recipients using Resend
 async function sendContactEmail({
   to,
   subject,
@@ -10,18 +11,9 @@ async function sendContactEmail({
   subject: string;
   text: string;
 }) {
-  // Configure transport from env (use SMTP or maildev for dev)
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: process.env.SMTP_FROM || "noreply@filmy.app", // Use a verified sender in Resend
     to,
     subject,
     text,
