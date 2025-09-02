@@ -26,7 +26,7 @@ async function sendContactEmail({
   const resend = new Resend(process.env.RESEND_API_KEY);
   console.log(`Sending contact email to: ${to.join(", ")}`);
   await resend.emails.send({
-    from: process.env.SMTP_FROM || "noreply@filmy.app", // Use a verified sender in Resend
+    from: process.env.SMTP_FROM || "onboarding@resend.dev", // Use a verified sender in Resend
     to,
     subject,
     text,
