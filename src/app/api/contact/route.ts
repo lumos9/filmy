@@ -1,4 +1,32 @@
 import { type NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+// Helper to send email to a list of recipients
+async function sendContactEmail({
+  to,
+  subject,
+  text,
+}: {
+  to: string[];
+  subject: string;
+  text: string;
+}) {
+  // Configure transport from env (use SMTP or maildev for dev)
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to,
+    subject,
+    text,
+  });
+}
 
 interface ContactFormData {
   name: string;
@@ -41,11 +69,19 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
 
-    // In a real application, you would:
-    // 1. Save to database
-    // 2. Send email notification to admin
-    // 3. Send confirmation email to user
-    // 4. Integrate with CRM or support system
+    // Send email to addresses in env CONTACT_EMAILS (comma-separated)
+    const contactEmails = (process.env.CONTACT_EMAILS || "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean);
+    if (contactEmails.length > 0) {
+      const emailText = `New contact form submission:\n\nName: ${name}\nEmail: ${email}\nType: ${contactType}\nSubject: ${subject}\nMessage:\n${message}\n\nSubmitted at: ${new Date().toISOString()}`;
+      await sendContactEmail({
+        to: contactEmails,
+        subject: `Filmy Contact Form: ${subject}`,
+        text: emailText,
+      });
+    }
 
     // For now, we'll simulate a successful submission
     return NextResponse.json(

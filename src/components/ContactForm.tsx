@@ -56,6 +56,8 @@ export function ContactForm() {
   });
 
   const [status, setStatus] = useState<FormStatus>({ type: "idle" });
+  // Store last successful submission to prevent spam/duplicate
+  const [lastSubmitted, setLastSubmitted] = useState<FormData | null>(null);
 
   const contactTypes = [
     {
@@ -82,8 +84,30 @@ export function ContactForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isDuplicate = (a: FormData | null, b: FormData) => {
+    if (!a) return false;
+    return (
+      a.name === b.name &&
+      a.email === b.email &&
+      a.contactType === b.contactType &&
+      a.subject === b.subject &&
+      a.message === b.message
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Prevent duplicate submission
+    if (isDuplicate(lastSubmitted, formData)) {
+      setStatus({
+        type: "error",
+        message:
+          "You have already submitted this message. Please modify your message or wait before submitting again.",
+      });
+      return;
+    }
+
     setStatus({ type: "loading" });
 
     try {
@@ -99,6 +123,7 @@ export function ContactForm() {
           message:
             "Thank you for reaching out! We'll get back to you within 24 hours.",
         });
+        setLastSubmitted(formData); // Save last successful submission
         setFormData({
           name: "",
           email: "",
@@ -107,7 +132,10 @@ export function ContactForm() {
           message: "",
         });
       } else {
-        throw new Error("Failed to send message");
+        setStatus({
+          type: "error",
+          message: "Sorry, something went wrong. Please try again.",
+        });
       }
     } catch (error) {
       setStatus({
@@ -125,16 +153,6 @@ export function ContactForm() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <Card className=" shadow-lg">
-        {/* <CardHeader className="text-center pb-8">
-          <CardTitle className="text-2xl font-bold text-foreground">
-            Get in Touch
-          </CardTitle>
-          <CardDescription className="text-muted-foreground text-lg">
-            We'd love to hear from you. Send us a message and we'll respond as
-            soon as possible.
-          </CardDescription>
-        </CardHeader> */}
-
         <CardContent className="space-y-6">
           {status.type === "success" && (
             <Alert className="border-green-200 bg-green-50 text-green-800">
