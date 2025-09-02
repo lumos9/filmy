@@ -75,8 +75,9 @@ export default async function Home() {
       {/* Hero content */}
       <main className="relative z-20 flex flex-col items-center justify-center text-center px-4 py-24 gap-8 w-full">
         <div className="flex flex-col items-center gap-4">
-          <span className="inline-flex items-center gap-3 text-primary font-bold text-4xl md:text-6xl tracking-tight drop-shadow-lg animate-pop">
-            <Film className="w-12 h-12 text-primary animate-pop" /> Filmy
+          <span className="inline-flex items-center gap-2 text-primary font-bold text-4xl md:text-6xl tracking-tight drop-shadow-lg animate-pop">
+            <Film className="w-8 h-8 md:w-12 md:h-12 text-primary animate-pop" />
+            Filmy
           </span>
           <span className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
             The global movie & screen knowledge platform. Explore, compare, and

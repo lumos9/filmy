@@ -106,7 +106,7 @@ export default function NavBar() {
             href="/"
             className="flex flex-row gap-2 items-center justify-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background rounded-md transition-colors"
           >
-            <Film className="w-5 h-5 text-primary animate-pop group-hover:scale-110 transition-transform" />
+            <Film className="w-7 h-7 text-primary animate-pop group-hover:scale-110 transition-transform" />
             <h1 className="text-3xl font-bold group-hover:text-primary transition-colors">
               Filmy
             </h1>

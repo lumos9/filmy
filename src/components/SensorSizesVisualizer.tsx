@@ -369,7 +369,7 @@ function SensorSelectDropdown({
         <SelectTrigger className="w-full max-w-xl">
           <SelectValue placeholder="Select a sensor format..." />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-64 overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="px-4 py-2 text-muted-foreground text-sm">
               No sensors found
