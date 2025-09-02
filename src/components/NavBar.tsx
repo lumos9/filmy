@@ -16,6 +16,7 @@ import {
   Ruler,
   HeartHandshake,
   Mail,
+  Tv,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,7 +29,7 @@ export default function NavBar() {
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/about", label: "About", icon: Info },
-    { href: "/screens", label: "Screens", icon: Film },
+    { href: "/screens", label: "Screens", icon: Tv },
     { href: "/sensor-sizes", label: "Sensor Sizes", icon: Ruler },
     { href: "/donate", label: "Donate", icon: HeartHandshake },
     { href: "/contact", label: "Contact", icon: Mail },
@@ -66,9 +67,16 @@ export default function NavBar() {
                   </span>
                 </SheetTitle>
                 {/* Mobile menu header with same height and font as desktop */}
-                <div className="flex justify-start items-center h-16 border-b">
-                  <span className="text-3xl font-bold">Filmy</span>
-                </div>
+                <Link
+                  href="/"
+                  className="flex justify-start items-center h-16 border-b gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background rounded-md transition-colors"
+                  tabIndex={0}
+                >
+                  <Film className="w-5 h-5 text-primary animate-pop group-hover:scale-110 transition-transform" />
+                  <span className="text-3xl font-bold group-hover:text-primary transition-colors">
+                    Filmy
+                  </span>
+                </Link>
                 <nav className="flex flex-col gap-2">
                   {links.map((link) => {
                     const Icon = link.icon;
@@ -94,9 +102,15 @@ export default function NavBar() {
               </SheetContent>
             </Sheet>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">Filmy</h1>
-          </div>
+          <Link
+            href="/"
+            className="flex flex-row gap-2 items-center justify-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background rounded-md transition-colors"
+          >
+            <Film className="w-7 h-7 text-primary animate-pop group-hover:scale-110 transition-transform" />
+            <h1 className="text-3xl font-bold group-hover:text-primary transition-colors">
+              Filmy
+            </h1>
+          </Link>
         </div>
         {/* Desktop nav */}
         <nav className="hidden md:flex gap-4 items-center">

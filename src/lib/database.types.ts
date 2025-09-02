@@ -65,6 +65,8 @@ export interface Database {
           opened_date: string | null;
           created_at: string;
           updated_at: string;
+          latitude?: number | null;
+          longitude?: number | null;
         };
         Insert: {
           id?: string;
