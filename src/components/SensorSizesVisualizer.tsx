@@ -326,7 +326,7 @@ function getScale() {
   //   if (window.innerWidth < 1024) return 11; // tablet
   //   return 15; // desktop
   // }
-  return 5.5;
+  return 3.5;
 }
 
 export default function SensorSizesVisualizer() {
@@ -375,44 +375,60 @@ export default function SensorSizesVisualizer() {
       </div>
       {/* Sensor visualization */}
       <div
-        className="relative touch-none"
+        className="relative touch-none mx-auto"
         style={{
-          width: maxW * scale + 40,
-          height: maxH * scale + 40,
+          width: `min(${maxW * scale + 40}px, 100vw)`,
+          height: `min(${maxH * scale + 40}px, 60vw, 70vh)`,
           maxWidth: "100vw",
-          maxHeight: "60vw",
+          maxHeight: "70vh",
         }}
       >
-        {SENSORS.map((sensor, idx) => {
-          const left = ((maxW - sensor.width) * scale) / 2 + 20;
-          const top = ((maxH - sensor.height) * scale) / 2 + 20;
-          const isActive = active === idx;
-          return (
-            <div
-              key={sensor.name}
-              className={`absolute transition-all duration-200 border-2 cursor-pointer flex items-center justify-center
-                ${
-                  isActive
-                    ? "border-blue-500 bg-blue-100/30 dark:bg-blue-900/30 z-20"
-                    : "border-muted bg-background/80 z-10"
+        {/* Render sensors from largest to smallest for correct stacking */}
+        {[...SENSORS]
+          .map((sensor, idx) => ({ sensor, idx }))
+          .sort(
+            (a, b) =>
+              b.sensor.width * b.sensor.height -
+              a.sensor.width * a.sensor.height
+          )
+          .map(({ sensor, idx }) => {
+            const left = ((maxW - sensor.width) * scale) / 2 + 20;
+            const top = ((maxH - sensor.height) * scale) / 2 + 20;
+            const isActive = active === idx;
+            return (
+              <div
+                key={sensor.name}
+                className={`absolute transition-all duration-200 border-2 cursor-pointer flex items-center justify-center
+                  ${
+                    isActive
+                      ? "border-blue-500 bg-blue-100/30 dark:bg-blue-900/30 z-30"
+                      : "border-muted bg-background/80"
+                  }
+                `}
+                style={{
+                  left,
+                  top,
+                  width: sensor.width * scale,
+                  height: sensor.height * scale,
+                  borderRadius: sensor.aspect === "1:1" ? 12 : 6,
+                  boxShadow: isActive
+                    ? "0 0 0 4px #3b82f6aa"
+                    : "0 1px 8px #0002",
+                  zIndex: isActive ? 100 : 10 + idx,
+                  opacity: 1,
+                  filter: isActive ? "none" : "grayscale(0.2) blur(0.08px)",
+                  transition: "opacity 0.2s, filter 0.2s",
+                }}
+                onClick={() => setActive(idx)}
+                aria-label={sensor.name}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) =>
+                  (e.key === "Enter" || e.key === " ") && setActive(idx)
                 }
-              `}
-              style={{
-                left,
-                top,
-                width: sensor.width * scale,
-                height: sensor.height * scale,
-                borderRadius: sensor.aspect === "1:1" ? 12 : 6,
-                boxShadow: isActive ? "0 0 0 4px #3b82f6aa" : "0 1px 8px #0002",
-                zIndex: isActive ? 30 : 10 + idx,
-                opacity: 1,
-                filter: isActive ? "none" : "grayscale(0.2) blur(0.08px)",
-                transition: "opacity 0.2s, filter 0.2s",
-              }}
-              onClick={() => setActive(idx)}
-            />
-          );
-        })}
+              />
+            );
+          })}
       </div>
       {/* Sensor details below visualizer */}
       <div className="max-w-md flex flex-col items-center justify-center text-center gap-4">
