@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import NavBar from "@/components/NavBar";
 import React, { Suspense } from "react";
 import TopProgressBar from "@/components/TopProgressBar";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +47,10 @@ export default function RootLayout({
                 <TopProgressBar />
               </Suspense>
             </div>
-            <main className="flex flex-1">{children}</main>
+            <main className="flex flex-1">
+              {children}
+              <Analytics />
+            </main>
           </div>
         </ThemeProvider>
       </body>
