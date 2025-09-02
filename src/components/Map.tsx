@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import { set } from "nprogress";
+import { formatNumberHuman } from "@/lib/utils";
 
 export interface GpsPoint {
   id: string;
@@ -22,6 +23,16 @@ const COLORS: Record<GpsPoint["nickname"], string> = {
   LieMAX: "#FF4500", // orange
   Hybrid: "#32CD32", // green
   Other: "#AAAAAA", // gray
+};
+
+const CAT_DESCRIPTIONS: Record<GpsPoint["nickname"], string> = {
+  "True IMAX":
+    "Full IMAX experience, typically 15/70mm film (1570) or IMAX Digital (DL/DL2), large screen & proprietary tech",
+  LieMAX:
+    "IMAX branding but smaller or non-IMAX-standard screens, often DL or DL2 formats",
+  Hybrid:
+    "Combination of IMAX and other projection formats; may include 1570, DL, DL2 on select screens",
+  Other: "Other or unspecified formats, e.g., non-IMAX or custom cinema setups",
 };
 
 // 🔹 Utility: convert GpsPoint[] into typed GeoJSON Features
@@ -227,7 +238,11 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             const isActive = activeFilter === cat;
             const allStripe =
               "repeating-linear-gradient(135deg, #444 0, #444 8px, #666 8px, #666 16px)";
-
+            // Correct count for each badge
+            const count =
+              cat === "All"
+                ? gpsPoints.length
+                : gpsPoints.filter((p) => p.nickname === cat).length;
             return (
               <Badge
                 key={cat}
@@ -245,47 +260,20 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 }}
                 onClick={() => setActiveFilter(cat)}
               >
-                {cat}
+                {cat} {"("}
+                {formatNumberHuman(count)}
+                {")"}
               </Badge>
             );
           }
         )}
       </div>
 
-      {/* 🔹 Counts and explanations for active filter only */}
-      {(() => {
-        const CAT_DESCRIPTIONS: Record<GpsPoint["nickname"], string> = {
-          "True IMAX": "Full IMAX experience, large screen & proprietary tech",
-          LieMAX: "IMAX branding but smaller/different tech",
-          Hybrid: "Mix of IMAX and other projection features",
-          Other: "Other/unspecified formats",
-        };
-        const count = gpsPoints.filter(
-          (p) => p.nickname === activeFilter
-        ).length;
-        const desc = CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]];
-
-        return (
-          <div className="text-sm text-muted-foreground">
-            {activeFilter == "All" ? "Showing all IMAX formats" : desc}
-          </div>
-          // <Card className="mb-2 w-full max-w-lg mx-auto bg-muted/60 border-muted-foreground/10">
-          //   <CardContent className="py-3 flex items-center gap-2 text-sm text-muted-foreground">
-          //     <span
-          //       className="inline-block w-3 h-3 rounded-full"
-          //       style={{
-          //         backgroundColor: COLORS[activeFilter as keyof typeof COLORS],
-          //       }}
-          //     ></span>
-          //     <span className="font-medium text-primary">{activeFilter}</span>
-          //     <span className="mx-1">•</span>
-          //     <span>{count} locations</span>
-          //     <span className="mx-1">—</span>
-          //     <span>{desc}</span>
-          //   </CardContent>
-          // </Card>
-        );
-      })()}
+      <div className="text-sm text-muted-foreground">
+        {activeFilter == "All"
+          ? "Showing all IMAX formats"
+          : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
+      </div>
 
       {/* 🔹 Map with loader */}
       <div className="relative w-full h-[400px] md:h-[700px] rounded-lg">

@@ -8,142 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { List, MapPin } from "lucide-react";
 import Map from "./Map";
 import { GpsPoint } from "./Map";
-
-// const theaters = [
-//   {
-//     name: "Boeing IMAX Theatre (Pacific Science Center, Seattle)",
-//     latitude: 47.6192,
-//     longitude: -122.3511,
-//   },
-//   {
-//     name: "Regal Issaquah Highlands 12 & IMAX",
-//     latitude: 47.5427, // Approx for 940 NE Park Dr
-//     longitude: -122.0330,
-//   },
-//   {
-//     name: "AMC Kent Station 14 & IMAX",
-//     latitude: 47.3836, // Approx for 426 Ramsay Way
-//     longitude: -122.2348,
-//   },
-//   {
-//     name: "Regal Martin Village Stadium 16 & IMAX",
-//     latitude: 47.0225, // Approx for 5400 E Martin Way, Lacey, WA
-//     longitude: -122.7727,
-//   },
-//   {
-//     name: "AMC Alderwood Mall 16 & IMAX",
-//     latitude: 47.8272, // Approx for Alderwood Mall Blvd, Lynnwood, WA
-//     longitude: -122.2752,
-//   },
-//   {
-//     name: "PACCAR IMAX Theatre (Pacific Science Center, Seattle)",
-//     latitude: 47.6205,
-//     longitude: -122.3514,
-//   },
-//   {
-//     name: "Regal Thornton Place Stadium 14 & IMAX",
-//     latitude: 47.7031, // Approx for 301 NE Thornton Pl, Seattle
-//     longitude: -122.3265,
-//   },
-//   {
-//     name: "AMC River Park Square 20 & IMAX",
-//     latitude: 47.6596,
-//     longitude: -117.4234,
-//   },
-//   {
-//     name: "AMC Southcenter 16 & IMAX",
-//     latitude: 47.4634, // Approx for 3600 Southcenter Mall, Tukwila
-//     longitude: -122.2545,
-//   },
-//   {
-//     name: "Regal Cascade Stadium 16 & IMAX",
-//     latitude: 45.6322, // Approx for 1101 SE 160th Ave, Vancouver, WA
-//     longitude: -122.5064,
-//   },
-// ];
-
-// export const theaters: GpsPoint[] = [
-//   {
-//     id: "1",
-//     coordinates: [-122.3511, 47.6192],
-//     metadata: {
-//       name: "Boeing IMAX Theatre",
-//       description: "Pacific Science Center, Seattle, WA",
-//     },
-//   },
-//   {
-//     id: "2",
-//     coordinates: [-122.033, 47.5427],
-//     metadata: {
-//       name: "Regal Issaquah Highlands 12 & IMAX",
-//       description: "Issaquah, WA, USA",
-//     },
-//   },
-//   {
-//     id: "3",
-//     coordinates: [-122.2348, 47.3836],
-//     metadata: {
-//       name: "AMC Kent Station 14 & IMAX",
-//       description: "Kent, WA, USA",
-//     },
-//   },
-//   {
-//     id: "4",
-//     coordinates: [-122.7727, 47.0225],
-//     metadata: {
-//       name: "Regal Martin Village Stadium 16 & IMAX",
-//       description: "Lacey, WA, USA",
-//     },
-//   },
-//   {
-//     id: "5",
-//     coordinates: [-122.2752, 47.8272],
-//     metadata: {
-//       name: "AMC Alderwood Mall 16 & IMAX",
-//       description: "Lynnwood, WA, USA",
-//     },
-//   },
-//   {
-//     id: "6",
-//     coordinates: [-122.3514, 47.6205],
-//     metadata: {
-//       name: "PACCAR IMAX Theatre",
-//       description: "Pacific Science Center, Seattle, WA",
-//     },
-//   },
-//   {
-//     id: "7",
-//     coordinates: [-122.3265, 47.7031],
-//     metadata: {
-//       name: "Regal Thornton Place Stadium 14 & IMAX",
-//       description: "Seattle, WA, USA",
-//     },
-//   },
-//   {
-//     id: "8",
-//     coordinates: [-117.4234, 47.6596],
-//     metadata: {
-//       name: "AMC River Park Square 20 & IMAX",
-//       description: "Spokane, WA, USA",
-//     },
-//   },
-//   {
-//     id: "9",
-//     coordinates: [-122.2545, 47.4634],
-//     metadata: {
-//       name: "AMC Southcenter 16 & IMAX",
-//       description: "Tukwila, WA, USA",
-//     },
-//   },
-//   {
-//     id: "10",
-//     coordinates: [-122.5064, 45.6322],
-//     metadata: {
-//       name: "Regal Cascade Stadium 16 & IMAX",
-//       description: "Vancouver, WA, USA",
-//     },
-//   },
-// ];
+import { formatNumberHuman } from "@/lib/utils";
 
 export default function ScreensDisplay() {
   // const [page, setPage] = useState(1);
@@ -328,7 +193,7 @@ export default function ScreensDisplay() {
           ) : (
             <div className="w-full flex flex-col items-center justify-center gap-2">
               <div className="text-sm text-muted-foreground">
-                Showing {screens.length} screen locations
+                Showing {formatNumberHuman(screens.length)} screen locations
               </div>
               <ScreensTableV2 screenData={screens} />
             </div>
