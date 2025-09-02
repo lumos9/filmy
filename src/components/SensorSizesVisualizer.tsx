@@ -329,6 +329,84 @@ function getScale() {
   return 3.5;
 }
 
+// Import shadcn/ui Select components
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "./ui/select";
+
+// Searchable dropdown component for sensors
+function SensorSelectDropdown({
+  sensors,
+  active,
+  setActive,
+}: {
+  sensors: typeof SENSORS;
+  active: number;
+  setActive: (idx: number) => void;
+}) {
+  const [search, setSearch] = React.useState("");
+  const filtered = search.trim()
+    ? sensors.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
+    : sensors;
+  return (
+    <>
+      {/* <input
+        type="text"
+        className="mb-2 w-full max-w-xl rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Search sensors..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        aria-label="Search sensors"
+      /> */}
+      <Select
+        value={String(active)}
+        onValueChange={(val) => setActive(Number(val))}
+      >
+        <SelectTrigger className="w-full max-w-xl">
+          <SelectValue placeholder="Select a sensor format..." />
+        </SelectTrigger>
+        <SelectContent>
+          {filtered.length === 0 ? (
+            <div className="px-4 py-2 text-muted-foreground text-sm">
+              No sensors found
+            </div>
+          ) : (
+            filtered.map((sensor) => (
+              <SelectItem
+                key={sensor.name}
+                value={String(sensors.indexOf(sensor))}
+              >
+                {sensor.name}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+    </>
+  );
+}
+
+// Message component to show the scale factor
+function ScaleMessage({ scale }: { scale: number }) {
+  let msg = "";
+  if (scale >= 1) {
+    msg = `All sensors are shown at 1:${Math.round(
+      scale
+    )} scale compared to real-world size.`;
+  } else {
+    msg = `All sensors are enlarged by ${Math.round(
+      1 / scale
+    )}x compared to real-world size.`;
+  }
+  return (
+    <div className="text-xs text-muted-foreground mt-1 text-center">{msg}</div>
+  );
+}
+
 export default function SensorSizesVisualizer() {
   const [active, setActive] = useState<number>(0);
   const [scale, setScale] = React.useState(getScale());
@@ -353,29 +431,19 @@ export default function SensorSizesVisualizer() {
         </div>
       </div>
 
-      {/* Sensor button group */}
-      <div className="w-full max-w-3xl">
-        <div className="w-full flex justify-center items-center flex-wrap gap-2 px-2 pb-2">
-          {SENSORS.map((sensor, idx) => (
-            <button
-              key={sensor.name}
-              className={`px-3 py-1 rounded-full border text-xs font-semibold whitespace-nowrap transition-colors
-                ${
-                  active === idx
-                    ? "bg-blue-600 text-white border-blue-600 shadow"
-                    : "bg-background border-muted hover:bg-accent hover:text-accent-foreground"
-                }
-              `}
-              onClick={() => setActive(idx)}
-            >
-              {sensor.name}
-            </button>
-          ))}
-        </div>
+      {/* Sensor dropdown using shadcn/ui Select with search */}
+      <div className="w-full max-w-3xl flex flex-col items-center px-2 pb-2 gap-2">
+        <SensorSelectDropdown
+          sensors={SENSORS}
+          active={active}
+          setActive={setActive}
+        />
+        <ScaleMessage scale={scale} />
       </div>
-      {/* Sensor visualization */}
+
+      {/* Sensor visualization (z-index 0 to stay behind dropdown/popover) */}
       <div
-        className="relative touch-none mx-auto"
+        className="relative touch-none mx-auto z-0"
         style={{
           width: `min(${maxW * scale + 40}px, 100vw)`,
           height: `min(${maxH * scale + 40}px, 60vw, 70vh)`,
