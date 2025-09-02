@@ -152,12 +152,12 @@ export function ContactForm() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 text-left">
+              <div className="grid gap-3 text-left">
                 <Label
                   htmlFor="name"
                   className="text-sm font-medium text-foreground"
                 >
-                  Full Name *
+                  Full Name
                 </Label>
                 <Input
                   id="name"
@@ -166,16 +166,16 @@ export function ContactForm() {
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                   required
-                  className="bg-input border-border focus:ring-ring"
+                  className="border-border focus:ring-ring"
                 />
               </div>
 
-              <div className="space-y-2 text-left">
+              <div className="grid gap-3 text-left">
                 <Label
                   htmlFor="email"
                   className="text-sm font-medium text-foreground"
                 >
-                  Email Address *
+                  Email Address
                 </Label>
                 <Input
                   id="email"
@@ -184,17 +184,17 @@ export function ContactForm() {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
-                  className="bg-input border-border focus:ring-ring"
+                  className="border-border focus:ring-ring"
                 />
               </div>
             </div>
 
-            <div className="space-y-2 text-left">
+            <div className="grid gap-3 text-left">
               <Label
                 htmlFor="contactType"
                 className="text-sm font-medium text-foreground"
               >
-                Contact Type *
+                Contact Type
               </Label>
               <Select
                 value={formData.contactType}
@@ -202,7 +202,7 @@ export function ContactForm() {
                   handleInputChange("contactType", value)
                 }
               >
-                <SelectTrigger className="bg-input border-border focus:ring-ring">
+                <SelectTrigger className="border-border focus:ring-ring">
                   <SelectValue placeholder="Select the type of inquiry" />
                 </SelectTrigger>
                 <SelectContent>
@@ -233,12 +233,12 @@ export function ContactForm() {
               )}
             </div>
 
-            <div className="space-y-2 text-left">
+            <div className="grid gap-3 text-left">
               <Label
                 htmlFor="subject"
                 className="text-sm font-medium text-foreground"
               >
-                Subject *
+                Subject
               </Label>
               <Input
                 id="subject"
@@ -247,16 +247,16 @@ export function ContactForm() {
                 value={formData.subject}
                 onChange={(e) => handleInputChange("subject", e.target.value)}
                 required
-                className="bg-input border-border focus:ring-ring"
+                className="border-border focus:ring-ring"
               />
             </div>
 
-            <div className="space-y-2 text-left">
+            <div className="grid gap-3 text-left">
               <Label
                 htmlFor="message"
                 className="text-sm font-medium text-foreground"
               >
-                Message *
+                Message
               </Label>
               <Textarea
                 id="message"
@@ -265,7 +265,7 @@ export function ContactForm() {
                 onChange={(e) => handleInputChange("message", e.target.value)}
                 required
                 rows={5}
-                className="bg-input border-border focus:ring-ring resize-none"
+                className="border-border focus:ring-ring resize-none"
               />
             </div>
 

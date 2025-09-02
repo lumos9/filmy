@@ -30,10 +30,11 @@ export default function TopProgressBar() {
 
   useEffect(() => {
     if (prevPath.current !== pathname) {
+      NProgress.configure({ showSpinner: false });
       NProgress.start();
       setTimeout(() => {
         NProgress.done();
-      }, 400); // Simulate loading, adjust as needed
+      }, 200); // Simulate loading, adjust as needed
       prevPath.current = pathname;
     }
   }, [pathname]);

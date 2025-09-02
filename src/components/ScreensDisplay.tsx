@@ -62,88 +62,88 @@ import { GpsPoint } from "./Map";
 //   },
 // ];
 
-export const theaters: GpsPoint[] = [
-  {
-    id: "1",
-    coordinates: [-122.3511, 47.6192],
-    metadata: {
-      name: "Boeing IMAX Theatre",
-      description: "Pacific Science Center, Seattle, WA",
-    },
-  },
-  {
-    id: "2",
-    coordinates: [-122.033, 47.5427],
-    metadata: {
-      name: "Regal Issaquah Highlands 12 & IMAX",
-      description: "Issaquah, WA, USA",
-    },
-  },
-  {
-    id: "3",
-    coordinates: [-122.2348, 47.3836],
-    metadata: {
-      name: "AMC Kent Station 14 & IMAX",
-      description: "Kent, WA, USA",
-    },
-  },
-  {
-    id: "4",
-    coordinates: [-122.7727, 47.0225],
-    metadata: {
-      name: "Regal Martin Village Stadium 16 & IMAX",
-      description: "Lacey, WA, USA",
-    },
-  },
-  {
-    id: "5",
-    coordinates: [-122.2752, 47.8272],
-    metadata: {
-      name: "AMC Alderwood Mall 16 & IMAX",
-      description: "Lynnwood, WA, USA",
-    },
-  },
-  {
-    id: "6",
-    coordinates: [-122.3514, 47.6205],
-    metadata: {
-      name: "PACCAR IMAX Theatre",
-      description: "Pacific Science Center, Seattle, WA",
-    },
-  },
-  {
-    id: "7",
-    coordinates: [-122.3265, 47.7031],
-    metadata: {
-      name: "Regal Thornton Place Stadium 14 & IMAX",
-      description: "Seattle, WA, USA",
-    },
-  },
-  {
-    id: "8",
-    coordinates: [-117.4234, 47.6596],
-    metadata: {
-      name: "AMC River Park Square 20 & IMAX",
-      description: "Spokane, WA, USA",
-    },
-  },
-  {
-    id: "9",
-    coordinates: [-122.2545, 47.4634],
-    metadata: {
-      name: "AMC Southcenter 16 & IMAX",
-      description: "Tukwila, WA, USA",
-    },
-  },
-  {
-    id: "10",
-    coordinates: [-122.5064, 45.6322],
-    metadata: {
-      name: "Regal Cascade Stadium 16 & IMAX",
-      description: "Vancouver, WA, USA",
-    },
-  },
-];
+// export const theaters: GpsPoint[] = [
+//   {
+//     id: "1",
+//     coordinates: [-122.3511, 47.6192],
+//     metadata: {
+//       name: "Boeing IMAX Theatre",
+//       description: "Pacific Science Center, Seattle, WA",
+//     },
+//   },
+//   {
+//     id: "2",
+//     coordinates: [-122.033, 47.5427],
+//     metadata: {
+//       name: "Regal Issaquah Highlands 12 & IMAX",
+//       description: "Issaquah, WA, USA",
+//     },
+//   },
+//   {
+//     id: "3",
+//     coordinates: [-122.2348, 47.3836],
+//     metadata: {
+//       name: "AMC Kent Station 14 & IMAX",
+//       description: "Kent, WA, USA",
+//     },
+//   },
+//   {
+//     id: "4",
+//     coordinates: [-122.7727, 47.0225],
+//     metadata: {
+//       name: "Regal Martin Village Stadium 16 & IMAX",
+//       description: "Lacey, WA, USA",
+//     },
+//   },
+//   {
+//     id: "5",
+//     coordinates: [-122.2752, 47.8272],
+//     metadata: {
+//       name: "AMC Alderwood Mall 16 & IMAX",
+//       description: "Lynnwood, WA, USA",
+//     },
+//   },
+//   {
+//     id: "6",
+//     coordinates: [-122.3514, 47.6205],
+//     metadata: {
+//       name: "PACCAR IMAX Theatre",
+//       description: "Pacific Science Center, Seattle, WA",
+//     },
+//   },
+//   {
+//     id: "7",
+//     coordinates: [-122.3265, 47.7031],
+//     metadata: {
+//       name: "Regal Thornton Place Stadium 14 & IMAX",
+//       description: "Seattle, WA, USA",
+//     },
+//   },
+//   {
+//     id: "8",
+//     coordinates: [-117.4234, 47.6596],
+//     metadata: {
+//       name: "AMC River Park Square 20 & IMAX",
+//       description: "Spokane, WA, USA",
+//     },
+//   },
+//   {
+//     id: "9",
+//     coordinates: [-122.2545, 47.4634],
+//     metadata: {
+//       name: "AMC Southcenter 16 & IMAX",
+//       description: "Tukwila, WA, USA",
+//     },
+//   },
+//   {
+//     id: "10",
+//     coordinates: [-122.5064, 45.6322],
+//     metadata: {
+//       name: "Regal Cascade Stadium 16 & IMAX",
+//       description: "Vancouver, WA, USA",
+//     },
+//   },
+// ];
 
 export default function ScreensDisplay() {
   // const [page, setPage] = useState(1);
@@ -158,6 +158,21 @@ export default function ScreensDisplay() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("map");
+
+  function classifyImax(
+    formats: string[]
+  ): "True IMAX" | "LieMAX" | "Hybrid" | "Other" {
+    if (!formats || formats.length === 0) return "Other";
+
+    const has1570 = formats.includes("1570");
+    const hasDigital = formats.some((f) => f.startsWith("D")); // D, DL, DL2, etc.
+
+    if (has1570 && hasDigital) return "Hybrid";
+    if (has1570) return "True IMAX";
+    if (hasDigital) return "LieMAX";
+
+    return "Other";
+  }
 
   useEffect(
     () => {
@@ -187,6 +202,7 @@ export default function ScreensDisplay() {
                   .filter(Boolean)
                   .join(", "),
               },
+              nickname: classifyImax(screen.formats || []),
             }));
           setScreensWithValidCoords(screensWithCoords);
 
@@ -291,6 +307,13 @@ export default function ScreensDisplay() {
             </Card>
           ) : (
             <Map gpsPoints={screensWithValidCoords} />
+            // <div className="w-full flex flex-col items-center justify-center gap-2">
+            //   <div className="text-sm text-muted-foreground">
+            //     Showing {screensWithValidCoords.length} geo-located screen
+            //     locations
+            //   </div>
+
+            // </div>
           )}
         </TabsContent>
         <TabsContent value="list" className="w-full mt-4">
@@ -303,7 +326,12 @@ export default function ScreensDisplay() {
               <div className="mt-6 h-64 w-full bg-muted rounded" />
             </Card>
           ) : (
-            <ScreensTableV2 screenData={screens} />
+            <div className="w-full flex flex-col items-center justify-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                Showing {screens.length} screen locations
+              </div>
+              <ScreensTableV2 screenData={screens} />
+            </div>
           )}
         </TabsContent>
       </Tabs>
