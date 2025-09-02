@@ -230,7 +230,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   `}</style>
 
       {/* 🔹 Filter badges */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex flex-row gap-2 flex-wrap justify-center items-center">
         {(["All", "True IMAX", "LieMAX", "Hybrid", "Other"] as const).map(
           (cat) => {
             const borderColor =
