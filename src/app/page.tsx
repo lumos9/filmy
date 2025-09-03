@@ -62,15 +62,17 @@ async function MovieDisplay() {
 
 export default async function Home() {
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+    <div className="relative w-full flex items-center justify-center overflow-hidden bg-black">
       {/* Fullscreen background image with overlay */}
       <img
-        src="/public/file.svg"
+        src="/assets/images/bg.jpeg"
         alt="Cinema background"
-        className="absolute inset-0 w-full h-full object-cover object-center opacity-60 blur-sm scale-105 z-0 select-none pointer-events-none"
+        className="fixed inset-0 w-full h-full object-cover object-center opacity-70 md:opacity-60 blur-sm md:blur-none scale-105 z-0 select-none pointer-events-none transition-all duration-700"
         draggable={false}
+        aria-hidden="true"
+        loading="eager"
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-[#0f172a]/80 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-[#0f172a]/90 z-10" />
 
       {/* Hero content */}
       <main className="relative z-20 flex flex-col items-center justify-center text-center px-4 py-24 gap-8 w-full">

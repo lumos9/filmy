@@ -70,13 +70,6 @@ export default function ScreensDisplay() {
               nickname: classifyImax(screen.formats || []),
             }));
           setScreensWithValidCoords(screensWithCoords);
-
-          console.log("screens with valid cords fetched:", screensWithCoords);
-          console.log(
-            "screens with valid cords fetched count:",
-            screensWithCoords.length
-          );
-          //console.log("screens with fake data:", theaters);
           setTotalCount(totalCount || 0);
         })
         .catch((e) => {
