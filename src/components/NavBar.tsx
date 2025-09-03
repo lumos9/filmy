@@ -17,6 +17,9 @@ import {
   HeartHandshake,
   Mail,
   Tv,
+  Camera,
+  Video,
+  Aperture,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,8 +32,9 @@ export default function NavBar() {
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/about", label: "About", icon: Info },
+    { href: "/cameras", label: "Cameras", icon: Video },
     { href: "/screens", label: "Screens", icon: Tv },
-    { href: "/sensor-sizes", label: "Sensor Sizes", icon: Ruler },
+    { href: "/sensors", label: "Sensors", icon: Aperture },
     { href: "/donate", label: "Donate", icon: HeartHandshake },
     { href: "/contact", label: "Contact", icon: Mail },
   ];

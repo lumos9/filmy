@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { SENSORS } from "@/lib/sensors";
 import { CAMERAS } from "@/lib/camera";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Find the largest sensor for scaling
 const maxW = Math.max(...SENSORS.map((s) => s.width));
@@ -43,14 +42,6 @@ function SensorSelectDropdown({
     : sensors;
   return (
     <>
-      {/* <input
-        type="text"
-        className="mb-2 w-full max-w-xl rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Search sensors..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        aria-label="Search sensors"
-      /> */}
       <Select
         value={String(active)}
         onValueChange={(val) => setActive(Number(val))}
@@ -96,7 +87,7 @@ function ScaleMessage({ scale }: { scale: number }) {
   );
 }
 
-export default function SensorSizesVisualizer() {
+export default function Sensors() {
   const [active, setActive] = useState<number>(0);
   const [scale, setScale] = React.useState(getScale());
 
@@ -112,15 +103,6 @@ export default function SensorSizesVisualizer() {
 
   return (
     <div className="md:container mx-auto p-4 max-w-md flex flex-col items-center gap-2 md:gap-4">
-      {/* Heading */}
-      <div className="flex flex-col items-center justify-center gap-2">
-        <h1 className="text-3xl font-bold">Sensor Sizes</h1>
-        <div className="text-center text-muted-foreground text-sm md:text-base">
-          Explore a visual guide to camera and projector sensor sizes. Select a
-          sensor to highlight its size below.
-        </div>
-      </div>
-
       {/* Sensor dropdown using shadcn/ui Select with search */}
       <div className="w-full flex flex-col items-center gap-2">
         <SensorSelectDropdown
@@ -207,10 +189,19 @@ export default function SensorSizesVisualizer() {
             <div className="font-bold text-muted-foreground">
               Compatible Cameras
             </div>
-            {CAMERAS[SENSORS[active].name]?.length ? (
-              <div className="flex flex-col items-center justify-center gap-1">
-                {CAMERAS[SENSORS[active].name].map((cam) => (
-                  <div key={cam}>{cam}</div>
+
+            {CAMERAS.filter((cam) => cam.sensor === SENSORS[active].name)
+              .length ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                {CAMERAS.filter(
+                  (cam) => cam.sensor === SENSORS[active].name
+                ).map((cam) => (
+                  <div
+                    key={cam.name}
+                    className="text-sm text-center p-2 border rounded-md w-full max-w-xs"
+                  >
+                    {cam.name}
+                  </div>
                 ))}
               </div>
             ) : (
