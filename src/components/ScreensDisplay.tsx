@@ -66,17 +66,17 @@ export default function ScreensDisplay() {
                 description: [screen.city, screen.state, screen.country]
                   .filter(Boolean)
                   .join(", "),
+                projections: screen.projections || [],
+                screenType: screen.screen_type || "",
+                screenSizeFt: screen.screen_size_ft || "",
+                formats: screen.formats || [],
+                opened: screen.opened_date
+                  ? new Date(screen.opened_date)
+                  : null,
               },
               nickname: classifyImax(screen.formats || []),
             }));
           setScreensWithValidCoords(screensWithCoords);
-
-          console.log("screens with valid cords fetched:", screensWithCoords);
-          console.log(
-            "screens with valid cords fetched count:",
-            screensWithCoords.length
-          );
-          //console.log("screens with fake data:", theaters);
           setTotalCount(totalCount || 0);
         })
         .catch((e) => {
