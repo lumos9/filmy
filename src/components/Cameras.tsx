@@ -85,6 +85,7 @@ function MoviesForCamera({ cameraName }: { cameraName: string }) {
 
   useEffect(() => {
     setLoading(true);
+    console.log("Fetching movies for camera:", cameraName);
     fetch(`/api/movies/${encodeURIComponent(cameraName)}`)
       .then((res) => res.json())
       .then((data) => setMovies(data))
