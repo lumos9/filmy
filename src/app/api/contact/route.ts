@@ -74,14 +74,16 @@ export async function POST(request: NextRequest) {
       .map((e) => e.trim())
       .filter(Boolean);
     if (contactEmails.length > 0) {
-      console.log(`Sending contact form email to: ${contactEmails.join(", ")}`);
+      console.log(
+        `Sending contact form email to: '${contactEmails.join(", ")}'`
+      );
       const emailText = `New contact form submission:\n\nName: ${name}\nEmail: ${email}\nType: ${contactType}\nSubject: ${subject}\nMessage:\n${message}\n\nSubmitted at: ${new Date().toISOString()}`;
       await sendContactEmail({
         to: contactEmails,
         subject: `Filmy Contact Form: ${subject}`,
         text: emailText,
       });
-      console.log(`Contact email sent to: ${contactEmails.join(", ")}`);
+      console.log(`Contact email sent to: '${contactEmails.join(", ")}'`);
     }
 
     // For now, we'll simulate a successful submission
