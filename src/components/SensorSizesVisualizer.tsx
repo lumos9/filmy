@@ -422,10 +422,10 @@ export default function SensorSizesVisualizer() {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center p-4 gap-4">
+    <div className="w-full flex flex-col items-center justify-center p-4 gap-2 md:gap-4">
       <div className="flex flex-col items-center justify-center gap-2">
         <h1 className="text-3xl font-bold">Sensor Sizes</h1>
-        <div className="text-center text-muted-foreground">
+        <div className="text-center text-muted-foreground text-sm md:text-base">
           Explore a visual guide to camera and projector sensor sizes. Select a
           sensor to highlight its size below.
         </div>
@@ -499,7 +499,7 @@ export default function SensorSizesVisualizer() {
           })}
       </div>
       {/* Sensor details below visualizer */}
-      <div className="max-w-md flex flex-col items-center justify-center text-center gap-4">
+      <div className="max-w-md flex flex-col items-center justify-center text-center gap-2">
         <div className="font-bold text-lg mb-1 text-blue-700 dark:text-blue-200">
           {SENSORS[active]?.name}
         </div>

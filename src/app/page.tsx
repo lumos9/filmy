@@ -82,26 +82,27 @@ export default async function Home() {
             Filmy
           </span>
           <span className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
-            The global movie & screen knowledge platform. Explore, compare, and
-            contribute to the world of cinema technology—one screen at a time.
+            The global IMAX movie & screen knowledge platform. Explore, compare,
+            and contribute to the world of cinema technology—one screen at a
+            time.
           </span>
         </div>
         <div className="flex flex-col md:flex-row gap-4 items-center justify-center mt-4 animate-fade-in">
           <Link href="/screens">
             <Button
               size="lg"
-              className="text-lg font-semibold px-8 py-5 shadow-xl"
+              className="text-lg font-semibold px-8 py-5 shadow-xl cursor-pointer"
             >
-              <Globe className="w-5 h-5 mr-2" /> Explore Screens
+              <Globe className="w-5 h-5" /> Explore Screens
             </Button>
           </Link>
           <Link href="/about">
             <Button
               variant="outline"
               size="lg"
-              className="text-lg font-semibold px-8 py-5 border-primary/30"
+              className="text-lg font-semibold px-8 py-5 border-primary/30 cursor-pointer"
             >
-              <Sparkles className="w-5 h-5 mr-2 text-primary" /> Learn More
+              <Sparkles className="w-5 h-5 text-primary" /> Learn More
             </Button>
           </Link>
         </div>

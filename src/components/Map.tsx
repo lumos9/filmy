@@ -103,19 +103,31 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       process.env.NEXT_PUBLIC_MAPBOX_DEFAULT_PUBLIC_TOKEN || "";
 
     const isMobile = window.innerWidth < 768; // typical breakpoint
-    const initialZoom = isMobile ? 2 : 3.5;
+    const initialZoom = isMobile ? 1 : 3.5;
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/dark-v10",
-      // center: gpsPoints[0]?.coordinates || [0, 0],
-      // zoom: 2,
-      center: [-98.5795, 39.8283], // 🇺🇸 approximate geographic center of contiguous US
-      zoom: initialZoom, // wide enough to show most of the US
+      center: [-98.5795, 39.8283],
+      zoom: initialZoom,
       attributionControl: false,
+      projection: { name: "globe" }, // Enable globe projection
     });
 
     mapRef.current.once("style.load", () => {
+      // Enable globe atmosphere for extra effect
+      if (
+        mapRef.current &&
+        mapRef.current.getProjection &&
+        mapRef.current.getProjection().name === "globe"
+      ) {
+        mapRef.current.setFog({
+          color: "#24292f",
+          "high-color": "#1e293b",
+          "space-color": "#000000",
+          "horizon-blend": 0.1,
+        });
+      }
       setIsMapLoading(false);
       // Add GeoJSON source
       mapRef.current?.addSource("points", {
@@ -132,7 +144,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         type: "circle",
         source: "points",
         paint: {
-          "circle-radius": 4,
+          "circle-radius": isMobile ? 3.3 : 4,
           "circle-color": [
             "match",
             ["get", "nickname"],
@@ -348,7 +360,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           </div>
           <div className="text-sm text-muted-foreground">
             {activeFilter == "All"
-              ? "Showing all IMAX formats"
+              ? "Showing all IMAX formats around the world"
               : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
           </div>
         </>
