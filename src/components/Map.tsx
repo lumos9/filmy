@@ -4,6 +4,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import { set } from "nprogress";
 import { formatNumberHuman } from "@/lib/utils";
@@ -14,6 +15,11 @@ export interface GpsPoint {
   metadata: {
     name: string;
     description: string;
+    projections?: string[];
+    screenType?: string;
+    screenSizeFt?: string;
+    formats?: string[];
+    opened: Date | null;
   };
   nickname: "True IMAX" | "LieMAX" | "Hybrid" | "Other";
 }
@@ -57,7 +63,12 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const gpsPointsRef = useRef<GpsPoint[]>(gpsPoints);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  // Keep gpsPointsRef up to date
+  useEffect(() => {
+    gpsPointsRef.current = gpsPoints;
+  }, [gpsPoints]);
 
   // 🔹 Filtering state
   const [activeFilter, setActiveFilter] = useState<
@@ -134,7 +145,18 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             COLORS["Other"], // default
           ],
         },
+        layout: {
+          visibility: "visible",
+        },
       });
+      // Bring layer to top
+      if (mapRef.current && mapRef.current.getStyle().layers) {
+        const layers = mapRef.current.getStyle().layers;
+        const lastLayerId = layers[layers.length - 1].id;
+        if (lastLayerId !== "points") {
+          mapRef.current.moveLayer("points");
+        }
+      }
 
       // --- Popup React rendering ---
       function MapPopupCard({
@@ -145,7 +167,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         onClose: () => void;
       }) {
         return (
-          <div className="relative max-w-xs rounded-lg border bg-card p-4 shadow-md text-left pr-10">
+          <div className="relative max-w-xs rounded-lg border bg-card p-4 shadow-md text-left pr-10 flex flex-col gap-2">
             <button
               onClick={onClose}
               className="cursor-pointer absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-xl"
@@ -154,22 +176,69 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             >
               <span aria-hidden="true">×</span>
             </button>
-            <div className="font-bold">{point.metadata.name}</div>
-            <div className="text-xs">{point.metadata.description}</div>
-            <div className="text-xs mt-1 italic text-muted-foreground">
-              {point.nickname}
+            <div className="font-bold text-base mb-1">
+              {point.metadata.name}
             </div>
+            <div className="text-xs text-muted-foreground mb-1">
+              {point.metadata.description}
+            </div>
+            <Separator className="my-1" />
+            <div className="flex flex-row flex-wrap gap-2 items-center text-xs text-muted-foreground">
+              {point.metadata.opened && (
+                <span>Opened {point.metadata.opened.toLocaleDateString()}</span>
+              )}
+              {point.metadata.screenType && (
+                <>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <span>{point.metadata.screenType}</span>
+                </>
+              )}
+              {point.metadata.screenSizeFt && (
+                <>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <span>{point.metadata.screenSizeFt}</span>
+                </>
+              )}
+            </div>
+            {(point.metadata.projections?.length || 0) > 0 && (
+              <>
+                <Separator className="my-1" />
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-semibold">Projections:</span>{" "}
+                  {point.metadata.projections?.join(", ")}
+                </div>
+              </>
+            )}
+            {(point.metadata.formats?.length || 0) > 0 && (
+              <>
+                <Separator className="my-1" />
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-semibold">Formats:</span>{" "}
+                  {point.metadata.formats?.join(", ")}
+                </div>
+              </>
+            )}
           </div>
         );
       }
 
-      // Click popup
-      mapRef.current?.on("click", "points", (e) => {
-        const feature = e.features?.[0];
-        if (feature && feature.properties) {
-          const id = feature.properties.id as string;
-          const found = gpsPoints.find((p) => p.id === id);
-          if (found) {
+      // Attach event handlers after layer is added
+      if (mapRef.current) {
+        mapRef.current.on("click", "points", (e) => {
+          console.log("[Map] Click event fired", e.features);
+          const feature = e.features?.[0];
+          if (!feature) {
+            console.warn("[Map] No feature found on click event");
+            return;
+          }
+          if (feature && feature.properties) {
+            console.log("[Map] Feature properties:", feature.properties);
+            const id = feature.properties.id as string;
+            const found = gpsPointsRef.current.find((p) => p.id === id);
+            if (!found) {
+              console.warn("[Map] No gpsPoint found for id", id);
+              return;
+            }
             if (popupRef.current) {
               popupRef.current.remove();
               popupRef.current = null;
@@ -191,16 +260,14 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               .setDOMContent(popupNode)
               .addTo(mapRef.current!);
           }
-        }
-      });
-
-      // Cursor style
-      mapRef.current?.on("mouseenter", "points", () => {
-        mapRef.current?.getCanvas().style.setProperty("cursor", "pointer");
-      });
-      mapRef.current?.on("mouseleave", "points", () => {
-        mapRef.current?.getCanvas().style.setProperty("cursor", "");
-      });
+        });
+        mapRef.current.on("mouseenter", "points", () => {
+          mapRef.current?.getCanvas().style.setProperty("cursor", "pointer");
+        });
+        mapRef.current.on("mouseleave", "points", () => {
+          mapRef.current?.getCanvas().style.setProperty("cursor", "");
+        });
+      }
     });
 
     return () => {
