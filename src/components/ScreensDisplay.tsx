@@ -134,11 +134,6 @@ export default function ScreensDisplay() {
     <div className="w-full md:container ms:mx-auto flex flex-col gap-4">
       <div className="flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl font-semibold">Screens</h1>
-        <div className="flex items-center justify-center gap-2 text-muted-foreground mt-1">
-          <span className="text-center">
-            {isLoading && "Loading screens information..."}
-          </span>
-        </div>
       </div>
       <Tabs
         value={tab}
@@ -161,7 +156,37 @@ export default function ScreensDisplay() {
             List View
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="map" className="w-full mt-4">
+        <TabsContent
+          value="map"
+          forceMount
+          className={`w-full mt-4 ${tab === "map" ? "block" : "hidden"}`}
+        >
+          <Map gpsPoints={screensWithValidCoords} />
+        </TabsContent>
+
+        <TabsContent
+          value="list"
+          forceMount
+          className={`w-full mt-4 ${tab === "list" ? "block" : "hidden"}`}
+        >
+          {isLoading ? (
+            <Card className="w-full p-6">
+              <div className="space-y-2">
+                <div className="h-6 w-48 bg-muted rounded" />
+                <div className="h-6 w-64 bg-muted rounded" />
+              </div>
+              <div className="mt-6 h-64 w-full bg-muted rounded" />
+            </Card>
+          ) : (
+            <div className="w-full flex flex-col items-center justify-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                Showing {formatNumberHuman(screens.length)} screen locations
+              </div>
+              <ScreensTableV2 screenData={screens} />
+            </div>
+          )}
+        </TabsContent>
+        {/* <TabsContent value="map" className="w-full mt-4">
           {isLoading ? (
             <Card className="w-full p-6 min-h-[400px] flex flex-col items-center justify-center">
               <div className="space-y-2 w-full flex flex-col items-center">
@@ -198,7 +223,7 @@ export default function ScreensDisplay() {
               <ScreensTableV2 screenData={screens} />
             </div>
           )}
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

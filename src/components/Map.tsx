@@ -91,11 +91,16 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     mapboxgl.accessToken =
       process.env.NEXT_PUBLIC_MAPBOX_DEFAULT_PUBLIC_TOKEN || "";
 
+    const isMobile = window.innerWidth < 768; // typical breakpoint
+    const initialZoom = isMobile ? 2 : 3.5;
+
     mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/dark-v10",
-      center: gpsPoints[0]?.coordinates || [0, 0],
-      zoom: 2,
+      // center: gpsPoints[0]?.coordinates || [0, 0],
+      // zoom: 2,
+      center: [-98.5795, 39.8283], // 🇺🇸 approximate geographic center of contiguous US
+      zoom: initialZoom, // wide enough to show most of the US
       attributionControl: false,
     });
 
@@ -229,51 +234,61 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     }
   `}</style>
 
-      {/* 🔹 Filter badges */}
-      <div className="flex flex-row gap-2 flex-wrap justify-center items-center">
-        {(["All", "True IMAX", "LieMAX", "Hybrid", "Other"] as const).map(
-          (cat) => {
-            const borderColor =
-              cat === "All" ? "#666666" : COLORS[cat as keyof typeof COLORS];
-            const isActive = activeFilter === cat;
-            const allStripe =
-              "repeating-linear-gradient(135deg, #444 0, #444 8px, #666 8px, #666 16px)";
-            // Correct count for each badge
-            const count =
-              cat === "All"
-                ? gpsPoints.length
-                : gpsPoints.filter((p) => p.nickname === cat).length;
-            return (
-              <Badge
-                key={cat}
-                variant="outline"
-                className="cursor-pointer"
-                style={{
-                  borderColor: cat === "All" ? "transparent" : borderColor,
-                  color: isActive || cat === "All" ? "#fff" : borderColor,
-                  background:
-                    cat === "All"
-                      ? allStripe
-                      : isActive
-                      ? borderColor
-                      : "transparent",
-                }}
-                onClick={() => setActiveFilter(cat)}
-              >
-                {cat} {"("}
-                {formatNumberHuman(count)}
-                {")"}
-              </Badge>
-            );
-          }
-        )}
-      </div>
-
-      <div className="text-sm text-muted-foreground">
-        {activeFilter == "All"
-          ? "Showing all IMAX formats"
-          : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
-      </div>
+      {/* Loader or filter badges/description */}
+      {isMapLoading ? (
+        <div className="flex flex-col items-center justify-center w-full">
+          {/* <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12 animate-spin mb-4" /> */}
+          <div className="text-sm text-muted-foreground">Loading map…</div>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-row gap-2 flex-wrap justify-center items-center">
+            {(["All", "True IMAX", "LieMAX", "Hybrid", "Other"] as const).map(
+              (cat) => {
+                const borderColor =
+                  cat === "All"
+                    ? "#666666"
+                    : COLORS[cat as keyof typeof COLORS];
+                const isActive = activeFilter === cat;
+                const allStripe =
+                  "repeating-linear-gradient(135deg, #444 0, #444 8px, #666 8px, #666 16px)";
+                // Correct count for each badge
+                const count =
+                  cat === "All"
+                    ? gpsPoints.length
+                    : gpsPoints.filter((p) => p.nickname === cat).length;
+                return (
+                  <Badge
+                    key={cat}
+                    variant="outline"
+                    className="cursor-pointer"
+                    style={{
+                      borderColor: cat === "All" ? "transparent" : borderColor,
+                      color: isActive || cat === "All" ? "#fff" : borderColor,
+                      background:
+                        cat === "All"
+                          ? allStripe
+                          : isActive
+                          ? borderColor
+                          : "transparent",
+                    }}
+                    onClick={() => setActiveFilter(cat)}
+                  >
+                    {cat} {"("}
+                    {formatNumberHuman(count)}
+                    {")"}
+                  </Badge>
+                );
+              }
+            )}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {activeFilter == "All"
+              ? "Showing all IMAX formats"
+              : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
+          </div>
+        </>
+      )}
 
       {/* 🔹 Map with loader */}
       <div className="relative w-full h-[400px] md:h-[700px] rounded-lg">
