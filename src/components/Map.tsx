@@ -211,7 +211,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 )}
                 {point.metadata.screenType && (
                   <>
-                    <Separator orientation="vertical" />
+                    <span className="text-muted-foreground">•</span>
                     <div className="text-muted-foreground">
                       {point.metadata.screenType}
                     </div>
@@ -219,7 +219,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 )}
                 {(point.metadata.formats?.length || 0) > 0 && (
                   <>
-                    <Separator orientation="vertical" />
+                    <span className="text-muted-foreground">•</span>
                     <div className="text-muted-foreground">
                       {point.metadata.formats?.join(", ")}
                     </div>
