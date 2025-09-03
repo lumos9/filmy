@@ -90,7 +90,7 @@ export default async function Home() {
           <Link href="/screens">
             <Button
               size="lg"
-              className="text-lg font-semibold px-8 py-5 shadow-xl"
+              className="text-lg font-semibold px-8 py-5 shadow-xl cursor-pointer"
             >
               <Globe className="w-5 h-5" /> Explore Screens
             </Button>
@@ -99,7 +99,7 @@ export default async function Home() {
             <Button
               variant="outline"
               size="lg"
-              className="text-lg font-semibold px-8 py-5 border-primary/30"
+              className="text-lg font-semibold px-8 py-5 border-primary/30 cursor-pointer"
             >
               <Sparkles className="w-5 h-5 text-primary" /> Learn More
             </Button>
