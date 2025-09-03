@@ -30,8 +30,9 @@ import {
   HelpCircle,
   Handshake,
   Loader2,
+  CheckCircle2Icon,
 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface FormData {
   name: string;
@@ -152,19 +153,23 @@ export function ContactForm() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <Card className=" shadow-lg">
+      <Card className="shadow-lg">
         <CardContent className="space-y-6">
           {status.type === "success" && (
-            <Alert className="border-green-200 bg-green-50 text-green-800">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>{status.message}</AlertDescription>
+            <Alert className="border-green-500/50 text-green-700">
+              <AlertTitle className="flex flex-row items-center gap-2">
+                <CheckCircle2Icon className="h-4 w-4" />
+                <div>{status.message}</div>
+              </AlertTitle>
             </Alert>
           )}
 
           {status.type === "error" && (
             <Alert className="border-destructive/50 bg-destructive/10 text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{status.message}</AlertDescription>
+              <AlertTitle className="flex flex-row items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                <div>{status.message}</div>
+              </AlertTitle>
             </Alert>
           )}
 
