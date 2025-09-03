@@ -92,7 +92,7 @@ export default async function Home() {
               size="lg"
               className="text-lg font-semibold px-8 py-5 shadow-xl"
             >
-              <Globe className="w-5 h-5 mr-2" /> Explore Screens
+              <Globe className="w-5 h-5" /> Explore Screens
             </Button>
           </Link>
           <Link href="/about">
@@ -101,7 +101,7 @@ export default async function Home() {
               size="lg"
               className="text-lg font-semibold px-8 py-5 border-primary/30"
             >
-              <Sparkles className="w-5 h-5 mr-2 text-primary" /> Learn More
+              <Sparkles className="w-5 h-5 text-primary" /> Learn More
             </Button>
           </Link>
         </div>
