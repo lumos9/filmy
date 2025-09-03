@@ -143,11 +143,15 @@ export default function Cameras() {
         <div className="flex flex-row items-center justify-center gap-1">
           <div className="flex flex-col border rounded-md items-center justify-center p-4 gap-2">
             <div className="text-muted-foreground">Camera</div>
-            <div className="text-sm font-medium">{CAMERAS[active]?.name}</div>
+            <div className="text-sm font-medium text-center">
+              {CAMERAS[active]?.name}
+            </div>
           </div>
           <div className="flex flex-col border rounded-md items-center justify-center p-4 gap-2">
             <div className="text-muted-foreground">Sensor</div>
-            <div className="text-sm font-medium">{CAMERAS[active]?.sensor}</div>
+            <div className="text-sm font-medium text-center">
+              {CAMERAS[active]?.sensor}
+            </div>
           </div>
         </div>
 

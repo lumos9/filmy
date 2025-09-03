@@ -6,11 +6,10 @@ import { CAMERA_MOVIES } from "@/lib/camerasAndMovies";
 const MOVIE_CACHE: Record<string, { movies: any[]; timestamp: number }> = {};
 const CACHE_TTL = 1000 * 60 * 10; // 10 minutes
 const CACHE_LIMIT = 100;
-export async function GET(
-  req: Request,
-  context: { params: { camera: string } }
-) {
-  const params = await context.params;
+
+export async function GET(req: Request, ctx: { params: { camera: string } }) {
+  // Await params for Next.js dynamic API route compatibility
+  const params = await (ctx.params as any);
   // Check cache first
   const cameraId = decodeURIComponent(params.camera);
   const now = Date.now();
