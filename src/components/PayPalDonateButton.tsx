@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Heart, Lock, CheckCircle, AlertCircle } from "lucide-react";
+import { Separator } from "./ui/separator";
 
 const donationAmounts = [
   { amount: 5, label: "$5" },
@@ -217,7 +218,7 @@ export function PayPalDonateButton() {
           {/* Preset Amount Buttons */}
           <div>
             <label className="text-sm font-medium mb-3 block">
-              Choose an amount:
+              Choose an amount
             </label>
             <div className="grid grid-cols-3 gap-2">
               {donationAmounts.map(({ amount, label }) => (
@@ -236,10 +237,22 @@ export function PayPalDonateButton() {
             </div>
           </div>
 
+          <div className="relative flex items-center my-4">
+            <div className="flex-grow">
+              <Separator />
+            </div>
+            <span className="mx-4 text-muted-foreground text-xs font-medium">
+              or
+            </span>
+            <div className="flex-grow">
+              <Separator />
+            </div>
+          </div>
+
           {/* Custom Amount Input */}
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Or enter a custom amount:
+              Enter a custom amount
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -248,7 +261,7 @@ export function PayPalDonateButton() {
               <input
                 type="number"
                 placeholder="0.00"
-                className="w-full pl-8 pr-4 py-3 rounded-lg border border-border bg-input focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                className="w-full pl-8 pr-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 value={customAmount}
                 onChange={(e) => {
                   setCustomAmount(e.target.value);
@@ -259,6 +272,8 @@ export function PayPalDonateButton() {
               />
             </div>
           </div>
+
+          <Separator />
 
           {/* Donation Button */}
           <Button

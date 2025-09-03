@@ -82,9 +82,8 @@ export default async function Home() {
             Filmy
           </span>
           <span className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
-            The global IMAX movie & screen knowledge platform. Explore, compare,
-            and contribute to the world of cinema technology—one screen at a
-            time.
+            The global movie & screen knowledge platform. Explore, compare, and
+            contribute to the world of cinema technology—one screen at a time.
           </span>
         </div>
         <div className="flex flex-col md:flex-row gap-4 items-center justify-center mt-4 animate-fade-in">
