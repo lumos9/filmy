@@ -135,7 +135,7 @@ export default function ScreensDisplay() {
       <div className="flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl font-semibold">Screens</h1>
       </div>
-      <Tabs
+      {/* <Tabs
         value={tab}
         onValueChange={setTab}
         className="w-full flex flex-col items-center justify-center"
@@ -186,45 +186,8 @@ export default function ScreensDisplay() {
             </div>
           )}
         </TabsContent>
-        {/* <TabsContent value="map" className="w-full mt-4">
-          {isLoading ? (
-            <Card className="w-full p-6 min-h-[400px] flex flex-col items-center justify-center">
-              <div className="space-y-2 w-full flex flex-col items-center">
-                <div className="h-6 w-48 bg-muted rounded" />
-                <div className="h-6 w-64 bg-muted rounded" />
-              </div>
-              <div className="mt-6 h-64 w-full bg-muted rounded" />
-            </Card>
-          ) : (
-            <Map gpsPoints={screensWithValidCoords} />
-            // <div className="w-full flex flex-col items-center justify-center gap-2">
-            //   <div className="text-sm text-muted-foreground">
-            //     Showing {screensWithValidCoords.length} geo-located screen
-            //     locations
-            //   </div>
-
-            // </div>
-          )}
-        </TabsContent>
-        <TabsContent value="list" className="w-full mt-4">
-          {isLoading ? (
-            <Card className="w-full p-6">
-              <div className="space-y-2">
-                <div className="h-6 w-48 bg-muted rounded" />
-                <div className="h-6 w-64 bg-muted rounded" />
-              </div>
-              <div className="mt-6 h-64 w-full bg-muted rounded" />
-            </Card>
-          ) : (
-            <div className="w-full flex flex-col items-center justify-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Showing {formatNumberHuman(screens.length)} screen locations
-              </div>
-              <ScreensTableV2 screenData={screens} />
-            </div>
-          )}
-        </TabsContent> */}
-      </Tabs>
+      </Tabs> */}
+      <Map gpsPoints={screensWithValidCoords} />
     </div>
   );
 }

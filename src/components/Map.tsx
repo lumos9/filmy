@@ -348,7 +348,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           </div>
           <div className="text-sm text-muted-foreground">
             {activeFilter == "All"
-              ? "Showing all IMAX formats"
+              ? "Showing all IMAX formats around the world"
               : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
           </div>
         </>
