@@ -167,7 +167,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         onClose: () => void;
       }) {
         return (
-          <div className="relative max-w-xs rounded-lg border bg-card p-4 shadow-md text-left pr-10 flex flex-col gap-2">
+          <div className="relative max-w-xs rounded-lg border bg-card p-4 shadow-md text-left pr-10">
             <button
               onClick={onClose}
               className="cursor-pointer absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-xl"
@@ -176,48 +176,45 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             >
               <span aria-hidden="true">×</span>
             </button>
-            <div className="font-bold text-base mb-1">
-              {point.metadata.name}
-            </div>
-            <div className="text-xs text-muted-foreground mb-1">
-              {point.metadata.description}
-            </div>
-            <Separator className="my-1" />
-            <div className="flex flex-row flex-wrap gap-2 items-center text-xs text-muted-foreground">
+            <div className="flex flex-col items-start gap-1">
+              <div className="text-sm font-medium">{point.metadata.name}</div>
+              <div className="text-muted-foreground text-xs">
+                {point.metadata.description}
+              </div>
               {point.metadata.opened && (
-                <span>Opened {point.metadata.opened.toLocaleDateString()}</span>
-              )}
-              {point.metadata.screenType && (
-                <>
-                  <Separator orientation="vertical" className="h-4 mx-1" />
-                  <span>{point.metadata.screenType}</span>
-                </>
+                <div className="text-muted-foreground text-xs">
+                  Opened {point.metadata.opened.toLocaleDateString()}
+                </div>
               )}
               {point.metadata.screenSizeFt && (
-                <>
-                  <Separator orientation="vertical" className="h-4 mx-1" />
-                  <span>{point.metadata.screenSizeFt}</span>
-                </>
+                <div className="text-muted-foreground text-xs">
+                  {point.metadata.screenSizeFt}
+                </div>
               )}
+              <div className="flex items-center space-x-2">
+                {(point.metadata.projections?.length || 0) > 0 && (
+                  <div className="text-muted-foreground">
+                    {point.metadata.projections?.join(", ")}
+                  </div>
+                )}
+                {point.metadata.screenType && (
+                  <>
+                    <Separator orientation="vertical" />
+                    <div className="text-muted-foreground">
+                      {point.metadata.screenType}
+                    </div>
+                  </>
+                )}
+                {(point.metadata.formats?.length || 0) > 0 && (
+                  <>
+                    <Separator orientation="vertical" />
+                    <div className="text-muted-foreground">
+                      {point.metadata.formats?.join(", ")}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            {(point.metadata.projections?.length || 0) > 0 && (
-              <>
-                <Separator className="my-1" />
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-semibold">Projections:</span>{" "}
-                  {point.metadata.projections?.join(", ")}
-                </div>
-              </>
-            )}
-            {(point.metadata.formats?.length || 0) > 0 && (
-              <>
-                <Separator className="my-1" />
-                <div className="text-xs text-muted-foreground">
-                  <span className="font-semibold">Formats:</span>{" "}
-                  {point.metadata.formats?.join(", ")}
-                </div>
-              </>
-            )}
           </div>
         );
       }
