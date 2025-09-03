@@ -14,24 +14,17 @@ async function sendContactEmail({
   if (!process.env.RESEND_API_KEY) {
     throw new Error("Resend API key is not configured");
   }
-  if (to.length === 0) {
-    throw new Error("No recipient email addresses provided");
-  }
-  if (!subject) {
-    throw new Error("Email subject is required");
-  }
-  if (!text) {
-    throw new Error("Email text content is required");
-  }
+
   const resend = new Resend(process.env.RESEND_API_KEY);
-  console.log(`Sending contact email to: ${to.join(", ")}`);
-  await resend.emails.send({
-    from: process.env.SMTP_FROM || "onboarding@resend.dev", // Use a verified sender in Resend
-    to,
+
+  const result = await resend.emails.send({
+    from: process.env.SMTP_FROM || "onboarding@resend.dev", // sandbox until verified
+    to: to,
     subject,
     text,
   });
-  console.log(`Contact email sent to: ${to.join(", ")}`);
+
+  console.log("Resend response:", result);
 }
 
 interface ContactFormData {
