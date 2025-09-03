@@ -133,7 +133,7 @@ export default function ScreensDisplay() {
   return (
     <div className="w-full md:container ms:mx-auto flex flex-col gap-4">
       <div className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-3xl font-semibold">Screens</h1>
+        <h1 className="text-3xl font-semibold">IMAX Screens</h1>
       </div>
       {/* <Tabs
         value={tab}
