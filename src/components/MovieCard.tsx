@@ -1,8 +1,7 @@
-import Image from "next/image";
-import { Database } from "@/lib/database.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Database } from "@/lib/database.types";
+import Image from "next/image";
 
 type Movie = Database["public"]["Tables"]["movies"]["Row"];
 

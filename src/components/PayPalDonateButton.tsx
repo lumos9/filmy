@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Heart, Lock, CheckCircle, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, CheckCircle, Heart, Lock, Shield } from "lucide-react";
+import { useState } from "react";
 import { Separator } from "./ui/separator";
 
 const donationAmounts = [

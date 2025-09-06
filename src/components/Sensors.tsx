@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import { SENSORS } from "@/lib/sensors";
 import { CAMERAS } from "@/lib/camera";
+import { SENSORS } from "@/lib/sensors";
+import React, { useState } from "react";
 
 // Find the largest sensor for scaling
 const maxW = Math.max(...SENSORS.map((s) => s.width));
@@ -17,14 +17,14 @@ function getScale() {
 }
 
 // Import shadcn/ui Select components
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "./ui/select";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 
 // Searchable dropdown component for sensors
 function SensorSelectDropdown({

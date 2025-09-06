@@ -1,4 +1,11 @@
-import { Database } from "@/lib/database.types";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -7,17 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { useState, useMemo } from "react";
+import { Database } from "@/lib/database.types";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { useMemo, useState } from "react";
 
 type Screen = Database["public"]["Tables"]["screens"]["Row"];
 
