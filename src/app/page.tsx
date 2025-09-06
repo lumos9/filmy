@@ -11,7 +11,7 @@ export default function Home() {
       <img
         src="/assets/images/bg.jpeg"
         alt="Cinema background"
-        className="fixed inset-0 w-full h-full object-cover object-center opacity-70 md:opacity-60 blur-sm md:blur-none scale-105 z-0 select-none pointer-events-none transition-all duration-700"
+        className="fixed inset-0 w-full h-full object-cover object-center md:opacity-60 scale-105 z-0 select-none pointer-events-none transition-all duration-700"
         draggable={false}
         aria-hidden="true"
         loading="eager"

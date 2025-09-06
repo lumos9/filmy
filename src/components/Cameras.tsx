@@ -131,10 +131,13 @@ function MoviesForCamera({ cameraName }: { cameraName: string }) {
     );
 
   return (
-    <div className="w-full flex flex-col gap-4 py-2">
+    <div className="w-full flex flex-col items-center justify-center gap-2 py-2">
       <h2 className="text-xl font-semibold text-center text-muted-foreground">
         Notable films
       </h2>
+      <div className="text-muted-foreground text-xs md:text-sm">
+        Notable films shot with the {cameraName}
+      </div>
       <div className="flex flex-row flex-wrap items-center justify-center">
         {movies.map((m) => (
           <MovieCard
