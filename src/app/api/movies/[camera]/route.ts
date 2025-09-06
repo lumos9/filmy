@@ -45,10 +45,43 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    MOVIE_CACHE[cameraId] = { movies: movies.filter(Boolean), timestamp: now };
+    // Filter out null results, deduplicate by id, and sort by release date (latest first)
+    const validMovies = movies.filter(
+      (movie): movie is NonNullable<typeof movie> => movie !== null
+    );
+
+    // Deduplicate by id, keeping the movie with the latest release date if duplicates exist
+    const uniqueMoviesMap = new Map<
+      number,
+      NonNullable<(typeof validMovies)[0]>
+    >();
+    validMovies.forEach((movie) => {
+      const existing = uniqueMoviesMap.get(movie.id);
+      if (
+        !existing ||
+        (movie.releaseDate &&
+          (!existing.releaseDate || movie.releaseDate > existing.releaseDate))
+      ) {
+        uniqueMoviesMap.set(movie.id, movie);
+      }
+    });
+
+    // Convert to array and sort by release date (latest first)
+    const uniqueMovies = Array.from(uniqueMoviesMap.values()).sort((a, b) => {
+      if (!a.releaseDate && !b.releaseDate) return 0;
+      if (!a.releaseDate) return 1;
+      if (!b.releaseDate) return -1;
+      return (
+        new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+      );
+    });
+
+    MOVIE_CACHE[cameraId] = { movies: uniqueMovies, timestamp: now };
     //console.log(movies);
-    console.log(`Returning ${movies.length} movies for camera: '${cameraId}'`);
-    return NextResponse.json(movies.filter(Boolean));
+    console.log(
+      `Returning ${uniqueMovies.length} movies for camera: '${cameraId}'`
+    );
+    return NextResponse.json(uniqueMovies);
   } catch (err) {
     console.error("API Error:", err);
     return NextResponse.json([], { status: 500 });

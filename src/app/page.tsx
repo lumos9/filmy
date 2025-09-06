@@ -1,73 +1,17 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Film, Globe, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { MoviesService } from "@/lib/movies.service";
-import MovieCard from "@/components/MovieCard";
-import LoadingSpinner from "@/components/LoadingSpinner";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import ScreensDisplay from "@/components/ScreensDisplay";
-import ThemeToggle from "@/components/ThemeToggle";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 
-async function MovieDisplay() {
-  try {
-    const movie = await MoviesService.getRandomMovie();
-
-    if (!movie) {
-      return (
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader className="text-center">
-            <div className="text-6xl mb-4">🎬</div>
-            <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground text-lg">
-              Your movie database is empty. Add some movies to get started!
-            </p>
-            <div className="bg-muted/50 rounded-lg p-6">
-              <h3 className="font-semibold text-lg mb-2">No Movies Found</h3>
-              <p className="text-muted-foreground">
-                Please add some movies to your database to see them displayed
-                here.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center">
-          <div className="text-6xl mb-4">🎬</div>
-          <CardTitle className="text-2xl">Welcome to Filmy</CardTitle>
-          <p className="text-muted-foreground">
-            Here's a movie from your collection:
-          </p>
-        </CardHeader>
-        <CardContent>
-          <MovieCard movie={movie} />
-        </CardContent>
-      </Card>
-    );
-  } catch (error) {
-    console.error("Error fetching movie:", error);
-    throw new Error("Failed to load movie data");
-  }
-}
-
-export default async function Home() {
+export default function Home() {
   return (
     <div className="relative w-full flex items-center justify-center overflow-hidden bg-black">
       {/* Fullscreen background image with overlay */}
       <img
         src="/assets/images/bg.jpeg"
         alt="Cinema background"
-        className="fixed inset-0 w-full h-full object-cover object-center opacity-70 md:opacity-60 blur-sm md:blur-none scale-105 z-0 select-none pointer-events-none transition-all duration-700"
+        className="fixed inset-0 w-full h-full object-cover object-center md:opacity-60 scale-105 z-0 select-none pointer-events-none transition-all duration-700"
         draggable={false}
         aria-hidden="true"
         loading="eager"
@@ -81,27 +25,29 @@ export default async function Home() {
             <Film className="w-8 h-8 md:w-12 md:h-12 text-primary animate-pop" />
             Filmy
           </span>
-          <span className="text-lg md:text-2xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
-            The global movie & screen knowledge platform. Explore, compare, and
-            contribute to the world of cinema technology—one screen at a time.
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white max-w-3xl animate-fade-in">
+            Uncover True IMAX, Visualize Cinema’s Soul
+          </h1>
+          <span className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
+            Map theaters, compare sensors, join the film tech revolution.
           </span>
         </div>
         <div className="flex flex-col md:flex-row gap-4 items-center justify-center mt-4 animate-fade-in">
           <Link href="/screens">
             <Button
               size="lg"
-              className="text-lg font-semibold px-8 py-5 shadow-xl cursor-pointer"
+              className="text-lg font-semibold px-8 py-5 shadow-xl hover:bg-primary/90 transition-all duration-300"
             >
-              <Globe className="w-5 h-5" /> Explore Screens
+              <Globe className="w-5 h-5 mr-2" /> Explore Screens
             </Button>
           </Link>
           <Link href="/about">
             <Button
               variant="outline"
               size="lg"
-              className="text-lg font-semibold px-8 py-5 border-primary/30 cursor-pointer"
+              className="text-lg font-semibold px-8 py-5 border-primary/30 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
             >
-              <Sparkles className="w-5 h-5 text-primary" /> Learn More
+              <Sparkles className="w-5 h-5 text-primary mr-2" /> Learn More
             </Button>
           </Link>
         </div>

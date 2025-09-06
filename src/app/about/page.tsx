@@ -1,7 +1,17 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Sparkles, Globe, Users, Film, Star } from "lucide-react";
+import {
+  Sparkles,
+  Globe,
+  Camera,
+  Monitor,
+  DollarSign,
+  Mail,
+  Film,
+} from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function AboutPage() {
   return (
@@ -16,101 +26,111 @@ export default function AboutPage() {
               variant="outline"
               className="text-xs md:text-base px-3 py-1 bg-primary/10 border-primary/20 text-primary font-semibold animate-bounce-in"
             >
-              The Global Movie & Screen Knowledge Platform
+              Uncover True IMAX, Visualize Cinema’s Soul
             </Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-8">
           <div className="flex flex-col gap-2 items-center">
             <p className="text-muted-foreground text-lg max-w-xl">
-              <span className="font-semibold text-primary">Filmy</span> is a
-              next-gen, open, and collaborative database for movie screens,
-              cinema tech, and the worldwide film community. We blend data,
-              design, and community to make cinema knowledge accessible, fun,
-              and powerful for everyone.
+              <span className="font-semibold text-primary">Filmy</span> is your
+              gateway to cinema’s technical heart. From mapping True IMAX
+              theaters to visualizing sensor sizes, we empower cinephiles,
+              filmmakers, and tech enthusiasts to explore, contribute, and
+              celebrate the art of film.
             </p>
           </div>
           <Separator />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="flex flex-col items-center gap-2">
-              <Globe className="w-8 h-8 text-blue-500" />
-              <h2 className="text-lg font-semibold">Global & Open</h2>
-              <p className="text-muted-foreground text-sm">
-                Explore screens and formats from every corner of the world.
-                Filmy is for everyone—no matter your city, language, or favorite
-                genre.
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Users className="w-8 h-8 text-green-500" />
-              <h2 className="text-lg font-semibold">Community-Driven</h2>
-              <p className="text-muted-foreground text-sm">
-                Add, edit, and review screens. Share your knowledge. Connect
-                with projectionists, cinephiles, and techies who love the big
-                screen as much as you do.
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Sparkles className="w-8 h-8 text-yellow-400" />
-              <h2 className="text-lg font-semibold">Tech & Transparency</h2>
-              <p className="text-muted-foreground text-sm">
-                Demystify IMAX, LieMAX, and every format in between. We break
-                down specs, tech, and what makes a true cinematic experience—no
-                marketing fluff.
-              </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <Star className="w-8 h-8 text-pink-500" />
-              <h2 className="text-lg font-semibold">For the Curious</h2>
-              <p className="text-muted-foreground text-sm">
-                Whether you’re a student, journalist, or just obsessed with
-                movies, Filmy is your launchpad for learning, comparing, and
-                discovering the world of cinema.
-              </p>
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-left flex items-center justify-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" /> What Filmy Offers
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="flex flex-col items-center gap-2">
+                <Globe className="w-8 h-8 text-blue-500" />
+                <h3 className="text-lg font-semibold">Interactive IMAX Map</h3>
+                <p className="text-muted-foreground text-sm">
+                  Explore a global map of IMAX screens, revealing True IMAX,
+                  LieMAX, and more. Click for details like screen size and
+                  projection type.
+                </p>
+                <Link href="/screens">
+                  <Button variant={"outline"} className="cursor-pointer">
+                    Explore the Map
+                  </Button>
+                </Link>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Camera className="w-8 h-8 text-green-500" />
+                <h3 className="text-lg font-semibold">Camera Database</h3>
+                <p className="text-muted-foreground text-sm">
+                  Discover cameras used in films, from IMAX 65mm to ARRI ALEXA,
+                  with notable movies sorted by release date.
+                </p>
+                <Link href="/cameras">
+                  <Button variant={"outline"} className="cursor-pointer">
+                    Browse Cameras
+                  </Button>
+                </Link>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Monitor className="w-8 h-8 text-yellow-400" />
+                <h3 className="text-lg font-semibold">Sensor Visualizer</h3>
+                <p className="text-muted-foreground text-sm">
+                  Compare sensor sizes (e.g., IMAX vs. Super 8) with our 1:4
+                  scaled visualizer and see cameras using each sensor.
+                </p>
+                <Link href="/sensors">
+                  <Button variant={"outline"} className="cursor-pointer">
+                    Visualize Now
+                  </Button>
+                </Link>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <DollarSign className="w-8 h-8 text-pink-500" />
+                <h3 className="text-lg font-semibold">Support Filmy</h3>
+                <p className="text-muted-foreground text-sm">
+                  Keep Filmy free with a small PayPal donation. Help us map
+                  every screen and camera worldwide.
+                </p>
+                <Link href="/donate">
+                  <Button variant={"outline"} className="cursor-pointer">
+                    Donate Now
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
           <Separator />
           <div className="space-y-3">
-            <h2 className="text-xl font-semibold text-left flex items-center gap-2">
-              <Film className="w-5 h-5 text-primary" /> What Makes Filmy
-              Different?
+            <h2 className="text-xl font-semibold text-left flex items-center justify-center gap-2">
+              <Mail className="w-5 h-5 text-blue-500" /> Join the Community
             </h2>
-            <ul className="list-disc list-inside text-left text-muted-foreground space-y-1">
-              <li>
-                Live, interactive map of IMAX, LieMAX, and more—see what’s near
-                you or across the globe
-              </li>
-              <li>
-                Compare projection formats, screen sizes, and tech specs
-                visually
-              </li>
-              <li>
-                Contribute new screens, corrections, and reviews in seconds
-              </li>
-              <li>
-                Stay up to date with the latest in cinema technology and trends
-              </li>
-              <li>
-                Connect with a global community of film lovers, experts, and
-                creators
-              </li>
-            </ul>
+            <p className="text-muted-foreground text-center">
+              Share feedback, propose collabs, or report a screen via our
+              contact form. Your input shapes the future of cinema tech.
+            </p>
+            <Link href="/contact">
+              <Button variant={"outline"} className="cursor-pointer">
+                Get in Touch
+              </Button>
+            </Link>
           </div>
           <Separator />
           <div className="space-y-2">
-            <h2 className="text-xl font-semibold text-left flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-left flex items-center justify-center gap-2">
               <Globe className="w-5 h-5 text-blue-500" /> Our Vision
             </h2>
-            <p className="text-muted-foreground text-left">
-              Filmy is built for the curious, the passionate, and the
-              community-minded. We believe every moviegoer deserves to know
-              what’s on the big screen, every cinema can showcase its strengths,
-              and the world’s film knowledge should be open to all.
+            <p className="text-muted-foreground text-center">
+              Filmy demystifies cinema technology, from True IMAX to sensor
+              sizes, making it accessible to all. Join us in building a global,
+              open database for film lovers and creators.
             </p>
-            <p className="text-muted-foreground text-left">
-              <span className="font-semibold text-primary">Join us</span> in
-              making cinema knowledge accessible, accurate, and inspiring—one
-              screen at a time.
+            <p className="text-muted-foreground text-center">
+              <span className="font-semibold text-primary">
+                Be part of the revolution
+              </span>
+              —explore, contribute, and uncover the soul of cinema.
             </p>
           </div>
         </CardContent>
