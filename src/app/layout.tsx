@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-// Removed duplicate import
 import NavBar from "@/components/NavBar";
 import React, { Suspense } from "react";
-import TopProgressBar from "@/components/TopProgressBar";
 import { Analytics } from "@vercel/analytics/next";
+import TopProgressBar from "@/components/TopProgressBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,8 +18,42 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Filmy - Screen Database",
-  description: "All about movie screens and formats",
+  title: "Filmy - Uncover True IMAX & Movie Sensors",
+  description:
+    "Uncover True IMAX theaters, visualize movie sensor sizes, and explore cinema technology with Filmy's global screen database.",
+  keywords: [
+    "IMAX",
+    "True IMAX",
+    "LieMAX",
+    "cinema sensors",
+    "movie cameras",
+    "film formats",
+    "screen database",
+  ],
+  openGraph: {
+    title: "Filmy - Uncover True IMAX, Visualize Cinema’s Soul",
+    description:
+      "Map True IMAX theaters, compare sensor sizes, and join the film tech revolution with Filmy.",
+    url: "https://your-site-url.com", // Replace with your actual site URL
+    siteName: "Filmy",
+    images: [
+      {
+        url: "/assets/images/og-image.jpg", // Replace with a high-quality image (e.g., Mapbox map or sensor visualizer screenshot)
+        width: 1200,
+        height: 630,
+        alt: "Filmy IMAX theater map and sensor visualizer",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Filmy - Uncover True IMAX, Visualize Cinema’s Soul",
+    description:
+      "Map True IMAX theaters and visualize movie sensor sizes with Filmy.",
+    images: ["/assets/images/og-image.jpg"], // Same image as Open Graph
+  },
 };
 
 export default function RootLayout({
