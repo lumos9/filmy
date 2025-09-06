@@ -65,9 +65,18 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
   const gpsPointsRef = useRef<GpsPoint[]>(gpsPoints);
   const [isMapLoading, setIsMapLoading] = useState(true);
+  const [pointsLoaded, setPointsLoaded] = useState(false);
+
   // Keep gpsPointsRef up to date
   useEffect(() => {
     gpsPointsRef.current = gpsPoints;
+    // Log when gpsPoints actually gets populated
+    if (gpsPoints.length > 0) {
+      console.log(
+        `📍 GPS POINTS RECEIVED: ${gpsPoints.length} IMAX locations received from parent component!`
+      );
+      setPointsLoaded(true);
+    }
   }, [gpsPoints]);
 
   // 🔹 Filtering state
@@ -169,6 +178,22 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           mapRef.current.moveLayer("points");
         }
       }
+
+      // // Log successful points loading (with delay to allow data to load)
+      // setTimeout(() => {
+      //   console.log(
+      //     `🎯 MAP POINTS LOADED: ${gpsPointsRef.current.length} IMAX locations successfully loaded and displayed on the map!`
+      //   );
+      // }, 1000);
+
+      // // Listen for when points source data is actually loaded
+      // mapRef.current?.on("sourcedata", (e) => {
+      //   if (e.sourceId === "points" && e.isSourceLoaded) {
+      //     console.log(
+      //       `✅ POINTS DATA LOADED: ${gpsPointsRef.current.length} IMAX locations are now visible on the map!`
+      //     );
+      //   }
+      // });
 
       // --- Popup React rendering ---
       function MapPopupCard({
@@ -311,7 +336,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   `}</style>
 
       {/* Loader or filter badges/description */}
-      {isMapLoading ? (
+      {isMapLoading || !pointsLoaded ? (
         <div className="flex flex-col items-center justify-center w-full">
           {/* <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12 animate-spin mb-4" /> */}
           <div className="text-sm text-muted-foreground">Loading map…</div>
@@ -368,7 +393,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
       {/* 🔹 Map with loader */}
       <div className="relative w-full h-[400px] md:h-[700px] rounded-lg">
-        {isMapLoading && (
+        {(isMapLoading || !pointsLoaded) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
             <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12"></div>
           </div>

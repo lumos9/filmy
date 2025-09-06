@@ -66,14 +66,21 @@ function MovieCard({
   releaseDate: string;
   poster: string;
 }) {
+  const year = releaseDate ? releaseDate.split("-")[0] : "Unknown";
+  // Truncate title to 25 characters max
+  const truncatedTitle =
+    title.length > 20 ? title.substring(0, 18) + "..." : title;
+
   return (
     <div className="flex flex-col p-2 gap-2 cursor-pointer items-center justify-center hover:bg-secondary">
       <div className="w-40 h-60 overflow-hidden rounded-md shadow-md ">
         <img src={poster} alt={title} className="w-full h-60 object-cover" />
       </div>
-      <div className="flex flex-col items-center justify-center">
-        <div className="text-sm font-bold break-words">{title}</div>
-        <div className="text-sm text-muted-foreground">{releaseDate}</div>
+      <div className="flex flex-col items-center justify-center h-12">
+        <div className="text-sm font-bold text-center leading-tight w-full">
+          {truncatedTitle}
+        </div>
+        <div className="text-sm text-muted-foreground">{year}</div>
       </div>
     </div>
   );
@@ -88,7 +95,12 @@ function MoviesForCamera({ cameraName }: { cameraName: string }) {
     console.log("Fetching movies for camera:", cameraName);
     fetch(`/api/movies/${encodeURIComponent(cameraName)}`)
       .then((res) => res.json())
-      .then((data) => setMovies(data))
+      .then((data) => {
+        console.log(
+          `Fetched ${data.length} movies for camera: '${cameraName}' from backend`
+        );
+        setMovies(data);
+      })
       .finally(() => setLoading(false));
   }, [cameraName]);
 
@@ -102,18 +114,16 @@ function MoviesForCamera({ cameraName }: { cameraName: string }) {
   if (!movies.length)
     return (
       <div className="w-full flex justify-center items-center py-8">
-        <div className="text-muted-foreground">
-          No movies found for this camera / sensor
-        </div>
+        <div className="text-muted-foreground">No data</div>
       </div>
     );
 
   return (
-    <div className="w-full max-w-4xl mt-4">
-      <h2 className="font-semibold mb-2 text-center text-muted-foreground">
+    <div className="w-full flex flex-col gap-4 py-2">
+      <h2 className="text-xl font-semibold text-center text-muted-foreground">
         Notable films
       </h2>
-      <div className="flex flex-row items-center justify-center gap-2 flex-wrap overflow-x-auto">
+      <div className="flex flex-row flex-wrap items-center justify-center">
         {movies.map((m) => (
           <MovieCard
             key={m.id}
@@ -131,7 +141,7 @@ export default function Cameras() {
   const [active, setActive] = useState<number>(0);
 
   return (
-    <div className="md:container mx-auto p-4 max-w-md flex flex-col items-center gap-2 md:gap-4">
+    <div className="sm:container sm:mx-auto md:p-4 w-full flex flex-col items-center gap-2 md:gap-4">
       {/* Camera dropdown using shadcn/ui Select with search */}
       <CamerasSelectDropdown
         cameras={CAMERAS}
@@ -140,7 +150,7 @@ export default function Cameras() {
       />
 
       {/* Camera details */}
-      <div className="rounded-lg border p-4 shadow-md flex flex-col items-center gap-2 text-sm md:text-base">
+      <div className="w-full rounded-lg border py-4 md:px-4 shadow-md flex flex-col items-center gap-2 text-sm md:text-base">
         <div className="flex flex-row items-center justify-center gap-1">
           <div className="flex flex-col border rounded-md items-center justify-center p-4 gap-2">
             <div className="text-muted-foreground">Camera</div>
