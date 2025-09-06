@@ -2,18 +2,12 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,18 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  CheckCircle,
   AlertCircle,
-  Send,
-  MessageSquare,
-  HelpCircle,
-  Handshake,
-  Loader2,
   CheckCircle2Icon,
+  Handshake,
+  HelpCircle,
+  Loader2,
+  MessageSquare,
+  Send,
 } from "lucide-react";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react";
 
 interface FormData {
   name: string;

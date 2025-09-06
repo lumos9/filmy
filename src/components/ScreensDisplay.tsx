@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ScreensService } from "@/lib/screens.service";
-import { ScreensTableV2 } from "./ScreensTableV2";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { List, MapPin } from "lucide-react";
-import Map from "./Map";
-import { GpsPoint } from "./Map";
-import { formatNumberHuman } from "@/lib/utils";
+import { ScreensService } from "@/lib/screens.service";
+import { useEffect, useState } from "react";
+import Map, { GpsPoint } from "./Map";
 
 export default function ScreensDisplay() {
   // const [page, setPage] = useState(1);

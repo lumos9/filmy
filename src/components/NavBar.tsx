@@ -2,29 +2,26 @@
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
 // import { Geist } from "next/font/google";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
-  Menu,
+  Aperture,
+  Film,
+  HeartHandshake,
   Home,
   Info,
-  Film,
-  Ruler,
-  HeartHandshake,
   Mail,
+  Menu,
   Tv,
-  Camera,
   Video,
-  Aperture,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import ThemeToggle from "@/components/ThemeToggle";
-import { Separator } from "@/components/ui/separator";
 
 export default function NavBar() {
   const pathname = usePathname();

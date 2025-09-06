@@ -1,8 +1,8 @@
 "use client";
+import { usePathname } from "next/navigation";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
 
 // Custom styles for a thin, bright cyan bar visible in both dark and light mode
 const customStyle = `

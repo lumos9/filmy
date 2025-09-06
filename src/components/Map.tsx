@@ -1,13 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { Badge } from "@/components/ui/badge";
+import { formatNumberHuman } from "@/lib/utils";
+import type { Feature, FeatureCollection, Point } from "geojson";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import type { Feature, FeatureCollection, Point } from "geojson";
-import { set } from "nprogress";
-import { formatNumberHuman } from "@/lib/utils";
+import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 
 export interface GpsPoint {
   id: string;
@@ -112,7 +109,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       process.env.NEXT_PUBLIC_MAPBOX_DEFAULT_PUBLIC_TOKEN || "";
 
     const isMobile = window.innerWidth < 768; // typical breakpoint
-    const initialZoom = isMobile ? 1 : 3.5;
+    const initialZoom = isMobile ? 1 : 3;
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -134,7 +131,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           color: "#24292f",
           "high-color": "#1e293b",
           "space-color": "#000000",
-          "horizon-blend": 0.1,
+          "horizon-blend": 0.03,
         });
       }
       setIsMapLoading(false);
@@ -178,22 +175,6 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           mapRef.current.moveLayer("points");
         }
       }
-
-      // // Log successful points loading (with delay to allow data to load)
-      // setTimeout(() => {
-      //   console.log(
-      //     `🎯 MAP POINTS LOADED: ${gpsPointsRef.current.length} IMAX locations successfully loaded and displayed on the map!`
-      //   );
-      // }, 1000);
-
-      // // Listen for when points source data is actually loaded
-      // mapRef.current?.on("sourcedata", (e) => {
-      //   if (e.sourceId === "points" && e.isSourceLoaded) {
-      //     console.log(
-      //       `✅ POINTS DATA LOADED: ${gpsPointsRef.current.length} IMAX locations are now visible on the map!`
-      //     );
-      //   }
-      // });
 
       // --- Popup React rendering ---
       function MapPopupCard({
@@ -392,7 +373,7 @@ const Map: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       )}
 
       {/* 🔹 Map with loader */}
-      <div className="relative w-full h-[400px] md:h-[700px] rounded-lg">
+      <div className="relative w-full h-[400px] md:h-[650px] rounded-lg">
         {(isMapLoading || !pointsLoaded) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40">
             <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12"></div>
