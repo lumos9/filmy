@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
     // Serve from cache if available
     const cached = MOVIE_CACHE[cameraId];
     if (cached && now - cached.timestamp < CACHE_TTL) {
-      console.log("Serving from cache for camera:", cameraId);
+      console.log(
+        `Returning ${cached.movies.length} cached movies for camera: '${cameraId}'`
+      );
       return NextResponse.json(cached.movies);
     }
 
@@ -44,6 +46,8 @@ export async function GET(request: NextRequest) {
     );
 
     MOVIE_CACHE[cameraId] = { movies: movies.filter(Boolean), timestamp: now };
+    //console.log(movies);
+    console.log(`Returning ${movies.length} movies for camera: '${cameraId}'`);
     return NextResponse.json(movies.filter(Boolean));
   } catch (err) {
     console.error("API Error:", err);
