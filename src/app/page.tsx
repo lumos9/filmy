@@ -86,29 +86,29 @@ export default function Home() {
             <Film className="w-8 h-8 md:w-12 md:h-12 text-primary animate-pop" />
             Filmy
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white max-w-3xl animate-fade-in">
+          <h1 className="text-2xl md:text-4xl font-extrabold text-white max-w-3xl animate-fade-in">
             Uncover True IMAX, Visualize Cinema’s Soul
           </h1>
           <span className="text-lg md:text-xl text-muted-foreground font-medium max-w-2xl animate-fade-in">
             Map theaters, compare sensors, join the film tech revolution.
           </span>
         </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-center mt-4 animate-fade-in">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-center animate-fade-in">
           <Link href="/screens">
             <Button
               size="lg"
-              className="text-lg font-semibold px-8 py-5 shadow-xl hover:bg-primary/90 transition-all duration-300"
+              className="text-lg font-semibold px-8 py-5 shadow-xl hover:bg-primary/90 transition-all duration-300 cursor-pointer"
             >
-              <Globe className="w-5 h-5 mr-2" /> Explore Screens
+              <Globe className="w-5 h-5 mr-1" /> Explore Screens
             </Button>
           </Link>
           <Link href="/about">
             <Button
               variant="outline"
               size="lg"
-              className="text-lg font-semibold px-8 py-5 border-primary/30 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
+              className="text-lg font-semibold px-8 py-5 border-primary/30 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 cursor-pointer"
             >
-              <Sparkles className="w-5 h-5 text-primary mr-2" /> Learn More
+              <Sparkles className="w-5 h-5 text-primary mr-1" /> Learn More
             </Button>
           </Link>
         </div>
