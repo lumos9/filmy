@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { formatNumberHuman } from "@/lib/utils";
 import type { Feature, FeatureCollection, Point } from "geojson";
 import * as maplibre from "maplibre-gl";
@@ -64,11 +65,13 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   const gpsPointsRef = useRef<GpsPoint[]>(gpsPoints);
   const [isMapLoading, setIsMapLoading] = useState(true);
   const [pointsLoaded, setPointsLoaded] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setLoadingProgress(10); // Initial progress
   }, []);
 
   // Fallback loading timeout
@@ -268,6 +271,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       console.log(
         `📍 GPS POINTS RECEIVED: ${gpsPoints.length} IMAX locations received from parent component!`
       );
+      setLoadingProgress(95);
       setPointsLoaded(true);
 
       // Add points to map if map is already loaded
@@ -327,6 +331,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
           });
 
           console.log("MapLibre: Points source and layer created successfully");
+          setLoadingProgress(100);
 
           // Add event handlers for new layer
           mapRef.current.on("click", "points", (e) => {
@@ -482,6 +487,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     mapRef.current.once("style.load", () => {
       console.log("MapLibre: Style loaded successfully");
       clearTimeout(timeoutId);
+      setLoadingProgress(80);
       setIsMapLoading(false);
 
       // Try to enable globe projection with proper configuration
@@ -760,22 +766,42 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     }
     .loader {
       border-top-color: #1e90ff;
+      border-right-color: #1e90ff30;
+      border-bottom-color: #1e90ff30;
+      border-left-color: #1e90ff30;
       animation: spin 1s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(30, 144, 255, 0.3));
     }
     @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   `}</style>
 
-      {/* Loader or filter badges/description */}
+      {/* Loading state with elegant messaging */}
       {isMapLoading || !pointsLoaded ? (
-        <div className="flex flex-col items-center justify-center w-full">
-          {/* <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12 animate-spin mb-4" /> */}
-          <div className="text-sm text-muted-foreground">Loading map…</div>
+        <div className="flex flex-col items-center justify-center w-full space-y-4 py-8">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12"></div>
+            <div className="text-center space-y-1">
+              <div className="text-sm font-medium text-foreground">
+                {!mapRef.current
+                  ? "Initializing globe projection..."
+                  : "Loading IMAX theaters..."}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {!mapRef.current
+                  ? "Setting up interactive 3D world map"
+                  : `Fetching ${
+                      gpsPoints.length || "theater"
+                    } locations worldwide`}
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         <>
+          {/* Filter badges - keeping exact same pattern */}
           <div className="flex flex-row gap-2 flex-wrap justify-center items-center">
             {(["All", "True IMAX", "LieMAX", "Hybrid", "Other"] as const).map(
               (cat) => {
@@ -795,7 +821,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                   <Badge
                     key={cat}
                     variant="outline"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-all duration-200 hover:scale-105"
                     style={{
                       borderColor: cat === "All" ? "transparent" : borderColor,
                       color: isActive || cat === "All" ? "#fff" : borderColor,
@@ -816,30 +842,62 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               }
             )}
           </div>
-          <div className="text-sm text-muted-foreground">
-            {activeFilter == "All"
-              ? "Showing all IMAX formats around the world"
-              : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
-          </div>
-          <div className="text-xs text-muted-foreground opacity-75">
-            �️ Interactive world map • Click points for details
+
+          {/* Descriptive text with better spacing */}
+          <div className="text-center space-y-2">
+            <div className="text-sm text-muted-foreground font-medium">
+              {activeFilter === "All"
+                ? `Displaying ${formatNumberHuman(
+                    gpsPoints.length
+                  )} IMAX theaters worldwide`
+                : `${CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}`}
+            </div>
+            <div className="text-xs text-muted-foreground opacity-75 flex items-center justify-center gap-1">
+              <span>🌍</span>
+              <span>
+                Interactive 3D globe • Click any point for theater details
+              </span>
+            </div>
           </div>
         </>
       )}
 
-      {/* 🔹 Map with loader */}
-      <div className="relative w-full h-[400px] md:h-[650px] rounded-lg">
+      {/* 3D Globe Map Container */}
+      <div className="relative w-full h-[400px] md:h-[650px] rounded-lg overflow-hidden border border-border/20">
         {(isMapLoading || !pointsLoaded) && (
           <div
-            className={`absolute inset-0 z-10 flex items-center justify-center ${
+            className={`absolute inset-0 z-10 flex flex-col items-center justify-center backdrop-blur-sm ${
               mounted &&
               (theme === "dark" ||
                 (theme === "system" && resolvedTheme === "dark"))
-                ? "bg-black/60"
-                : "bg-gray-500/50"
+                ? "bg-black/70"
+                : "bg-white/70"
             }`}
           >
-            <div className="loader border-4 border-t-blue-500 border-gray-200 rounded-full w-12 h-12"></div>
+            <div className="flex flex-col items-center space-y-4 w-full max-w-sm">
+              <Progress value={loadingProgress} className="w-full h-3" />
+              <div className="text-center space-y-2">
+                <div className="text-base font-medium text-foreground">
+                  {!mapRef.current
+                    ? "Preparing Globe View"
+                    : "Loading Theater Data"}
+                </div>
+                <div className="text-sm text-muted-foreground max-w-xs">
+                  {!mapRef.current
+                    ? "Initializing 3D projection and map tiles..."
+                    : "Plotting IMAX locations on the interactive globe..."}
+                </div>
+                <div className="text-xs text-muted-foreground opacity-75">
+                  {loadingProgress}% complete
+                </div>
+                {gpsPoints.length > 0 && (
+                  <div className="text-xs text-muted-foreground opacity-75">
+                    {formatNumberHuman(gpsPoints.length)} theaters ready to
+                    display
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
         <div ref={mapContainer} className="w-full h-full rounded-lg" />
