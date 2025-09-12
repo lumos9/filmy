@@ -1,18 +1,15 @@
 "use client";
+import ThemeToggle from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState } from "react";
-// import { Geist } from "next/font/google";
-import ThemeToggle from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
 import {
   Aperture,
   Film,
-  HeartHandshake,
   Home,
   Info,
   Mail,
@@ -22,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -32,7 +30,7 @@ export default function NavBar() {
     { href: "/cameras", label: "Cameras", icon: Video },
     { href: "/screens", label: "Screens", icon: Tv },
     { href: "/sensors", label: "Sensors", icon: Aperture },
-    { href: "/donate", label: "Donate", icon: HeartHandshake },
+    // { href: "/donate", label: "Donate", icon: HeartHandshake },
     { href: "/contact", label: "Contact", icon: Mail },
   ];
 

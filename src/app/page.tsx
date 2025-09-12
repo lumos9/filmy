@@ -1,20 +1,81 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import VisitorTracker from "@/components/VisitorTracker";
 import { Film, Globe, Sparkles } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+function VisitorCount() {
+  const [uniqueCount, setUniqueCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVisitorCount = async () => {
+      try {
+        const res = await fetch("/api/visitors/getCount", {
+          cache: "no-store",
+        });
+        if (!res.ok) throw new Error("Failed to fetch visitor count");
+
+        const data = await res.json();
+        console.log("Fetched unique visitor count:", data);
+        setUniqueCount(data.uniqueVisitors);
+      } catch (error) {
+        console.error("Error fetching visitor count:", error);
+        setUniqueCount(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVisitorCount();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2">
+        <LoadingSpinner size="sm" variant="spinner" />
+        <span className="text-sm text-muted-foreground">
+          Loading visitor count...
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <Badge variant="secondary" className="animate-pulse text-sm">
+      {uniqueCount.toLocaleString()} unique{" "}
+      {uniqueCount === 1 ? "explorer" : "explorers"} uncovered cinema's soul in
+      last 7 days <Globe className="w-4 h-4 ml-1 inline" />
+    </Badge>
+  );
+}
 
 export default function Home() {
+  const [trackingSuccessful, setTrackingSuccessful] = useState<boolean | null>(
+    null
+  );
+
+  const handleTrackingComplete = (success: boolean) => {
+    setTrackingSuccessful(success);
+  };
+
   return (
     <div className="relative w-full flex items-center justify-center overflow-hidden bg-black">
       {/* Fullscreen background image with overlay */}
-      <img
+      <Image
         src="/assets/images/bg.jpeg"
         alt="Cinema background"
-        className="fixed inset-0 w-full h-full object-cover object-center md:opacity-60 scale-105 z-0 select-none pointer-events-none transition-all duration-700"
-        draggable={false}
-        aria-hidden="true"
-        loading="eager"
+        fill
+        className="object-cover object-center md:opacity-60 scale-105 select-none pointer-events-none"
+        priority
+        quality={85}
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
       />
       <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/70 to-[#0f172a]/90 z-10" />
 
@@ -51,6 +112,8 @@ export default function Home() {
             </Button>
           </Link>
         </div>
+        <VisitorTracker onTrackingComplete={handleTrackingComplete} />
+        {trackingSuccessful === true && <VisitorCount />}
       </main>
     </div>
   );
