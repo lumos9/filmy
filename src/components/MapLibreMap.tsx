@@ -79,7 +79,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       );
       setIsMapLoading(false);
       setPointsLoaded(true);
-    }, 8000); // 8 seconds
+    }, 5000); // 5 seconds
 
     return () => clearTimeout(fallbackTimeout);
   }, []);

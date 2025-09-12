@@ -75,6 +75,9 @@ export default function ScreensDisplay() {
             }));
           setScreensWithValidCoords(screensWithCoords);
           setTotalCount(totalCount || 0);
+          console.log(
+            `Loaded ${screens.length} screens with valid coords ${screensWithCoords.length}`
+          );
         })
         .catch((e) => {
           if (!isMounted) return;
