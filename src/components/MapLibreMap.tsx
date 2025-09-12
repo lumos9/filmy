@@ -26,7 +26,7 @@ const COLORS: Record<GpsPoint["nickname"], string> = {
   "True IMAX": "#1E90FF", // blue
   LieMAX: "#FF4500", // orange
   Hybrid: "#32CD32", // green
-  Other: "#AAAAAA", // gray
+  Other: "#FFD700", // gold/yellow - bright and distinct
 };
 
 const CAT_DESCRIPTIONS: Record<GpsPoint["nickname"], string> = {
