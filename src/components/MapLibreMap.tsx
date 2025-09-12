@@ -84,14 +84,76 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     return () => clearTimeout(fallbackTimeout);
   }, []);
 
-  // Get map style based on current theme
+  // Get map style optimized for globe projection
   const getMapStyle = (currentTheme: string | undefined) => {
     const isDark =
       currentTheme === "dark" ||
       (currentTheme === "system" && resolvedTheme === "dark");
+
+    // Use Natural Earth data style for better globe appearance
     return isDark
-      ? "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json"
-      : "https://tiles.stadiamaps.com/styles/alidade_smooth.json";
+      ? {
+          version: 8 as const,
+          sources: {
+            "natural-earth": {
+              type: "raster" as const,
+              tiles: [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+              ],
+              tileSize: 256,
+              attribution:
+                "© Esri, HERE, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors",
+            },
+          },
+          layers: [
+            {
+              id: "background",
+              type: "background" as const,
+              paint: {
+                "background-color": "#0f172a", // Deep space-like background
+              },
+            },
+            {
+              id: "natural-earth",
+              type: "raster" as const,
+              source: "natural-earth",
+              paint: {
+                "raster-opacity": 1,
+              },
+            },
+          ],
+        }
+      : {
+          version: 8 as const,
+          sources: {
+            "natural-earth": {
+              type: "raster" as const,
+              tiles: [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+              ],
+              tileSize: 256,
+              attribution:
+                "© Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+            },
+          },
+          layers: [
+            {
+              id: "background",
+              type: "background" as const,
+              paint: {
+                "background-color": "#1e3a8a", // Deep blue space background
+              },
+            },
+            {
+              id: "natural-earth",
+              type: "raster" as const,
+              source: "natural-earth",
+              paint: {
+                "raster-opacity": 1,
+              },
+            },
+          ],
+        };
   };
 
   // Function to add points to the map
@@ -128,7 +190,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         type: "circle",
         source: "points",
         paint: {
-          "circle-radius": isMobile ? 3.3 : 4,
+          "circle-radius": isMobile ? 5 : 6, // Increased size for globe visibility
           "circle-color": [
             "match",
             ["get", "nickname"],
@@ -140,6 +202,10 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             COLORS["Hybrid"],
             COLORS["Other"], // default
           ],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-opacity": 0.8,
+          "circle-opacity": 0.9,
         },
         layout: {
           visibility: "visible",
@@ -238,7 +304,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             type: "circle",
             source: "points",
             paint: {
-              "circle-radius": isMobile ? 3.3 : 4,
+              "circle-radius": isMobile ? 5 : 6, // Increased size for globe visibility
               "circle-color": [
                 "match",
                 ["get", "nickname"],
@@ -250,6 +316,10 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 COLORS["Hybrid"],
                 COLORS["Other"], // default
               ],
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#ffffff",
+              "circle-stroke-opacity": 0.8,
+              "circle-opacity": 0.9,
             },
             layout: {
               visibility: "visible",
@@ -376,7 +446,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     setIsMapLoading(true);
 
     const isMobile = window.innerWidth < 768; // typical breakpoint
-    const initialZoom = isMobile ? 1 : 3;
+    const initialZoom = isMobile ? 1.5 : 2.5; // Adjusted for globe view
 
     mapRef.current = new maplibre.Map({
       container: mapContainer.current,
@@ -386,10 +456,19 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       attributionControl: false,
     });
 
-    // Add error handling
+    // Add comprehensive error handling
     mapRef.current.on("error", (e) => {
       console.error("MapLibre: Map error", e);
       setIsMapLoading(false);
+      // Don't show error to user, just fallback gracefully
+    });
+
+    mapRef.current.on("sourcedataloading", () => {
+      console.log("MapLibre: Source data loading...");
+    });
+
+    mapRef.current.on("styledata", () => {
+      console.log("MapLibre: Style data loaded");
     });
 
     // Fallback timeout in case style.load never fires
@@ -398,20 +477,30 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         "MapLibre: Style load timeout, forcing loading state to false"
       );
       setIsMapLoading(false);
-    }, 10000); // 10 second timeout
+    }, 15000); // Increased timeout for slower connections
 
     mapRef.current.once("style.load", () => {
       console.log("MapLibre: Style loaded successfully");
       clearTimeout(timeoutId);
       setIsMapLoading(false);
 
+      // Try to enable globe projection with proper configuration
+      try {
+        console.log("MapLibre: Attempting to enable globe projection...");
+        mapRef.current?.setProjection({
+          type: "globe",
+        } as any);
+
+        console.log("MapLibre: Globe projection enabled successfully!");
+      } catch (error) {
+        console.warn("MapLibre: Globe projection not supported:", error);
+      }
+
       // Use current GPS points from ref (most up-to-date)
       const currentPoints = gpsPointsRef.current;
       console.log(
         `MapLibre: Adding ${currentPoints.length} points to map after style load`
-      );
-
-      // Add GeoJSON source
+      ); // Add GeoJSON source
       mapRef.current?.addSource("points", {
         type: "geojson",
         data: {
@@ -420,13 +509,13 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
         } as FeatureCollection<Point>,
       });
 
-      // Add layer with categorical colors
+      // Add layer with categorical colors optimized for globe view
       mapRef.current?.addLayer({
         id: "points",
         type: "circle",
         source: "points",
         paint: {
-          "circle-radius": isMobile ? 3.3 : 4,
+          "circle-radius": isMobile ? 5 : 6, // Increased size for globe visibility
           "circle-color": [
             "match",
             ["get", "nickname"],
@@ -438,6 +527,10 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             COLORS["Hybrid"],
             COLORS["Other"], // default
           ],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-opacity": 0.8,
+          "circle-opacity": 0.9,
         },
         layout: {
           visibility: "visible",
@@ -493,15 +586,36 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               >
                 {point.metadata.description}
               </div>
-              {point.metadata.opened && (
-                <div
-                  className={`text-muted-foreground text-xs ${
-                    isDark ? "text-gray-300" : ""
-                  }`}
-                >
-                  Opened {point.metadata.opened.toLocaleDateString()}
-                </div>
-              )}
+              <div className="flex items-center space-x-2">
+                {point.nickname && (
+                  <div
+                    className={`text-muted-foreground text-xs ${
+                      isDark ? "text-gray-300" : ""
+                    }`}
+                  >
+                    {point.nickname}
+                  </div>
+                )}
+                {point.metadata.opened && (
+                  <>
+                    <span
+                      className={`text-muted-foreground ${
+                        isDark ? "text-gray-400" : ""
+                      }`}
+                    >
+                      •
+                    </span>
+                    <div
+                      className={`text-muted-foreground text-xs ${
+                        isDark ? "text-gray-300" : ""
+                      }`}
+                    >
+                      Opened {point.metadata.opened.toLocaleDateString()}
+                    </div>
+                  </>
+                )}
+              </div>
+
               {point.metadata.screenSizeFt && (
                 <div
                   className={`text-muted-foreground text-xs ${
@@ -630,7 +744,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
   }, [theme, resolvedTheme, mounted]);
 
   return (
-    <div className="w-full flex flex-col gap-4 items-center justify-center">
+    <div className="w-full flex flex-col gap-2 items-center justify-center">
       <style>{`
     .maplibregl-popup-content {
       background: transparent !important;
@@ -706,6 +820,9 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             {activeFilter == "All"
               ? "Showing all IMAX formats around the world"
               : CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}
+          </div>
+          <div className="text-xs text-muted-foreground opacity-75">
+            �️ Interactive world map • Click points for details
           </div>
         </>
       )}
