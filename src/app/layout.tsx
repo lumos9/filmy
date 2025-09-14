@@ -1,11 +1,11 @@
+import NavBar from "@/components/NavBar";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import TopProgressBar from "@/components/TopProgressBar";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import NavBar from "@/components/NavBar";
 import React, { Suspense } from "react";
-import { Analytics } from "@vercel/analytics/next";
-import TopProgressBar from "@/components/TopProgressBar";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

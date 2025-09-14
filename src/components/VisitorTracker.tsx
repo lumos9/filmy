@@ -104,9 +104,9 @@ export default function VisitorTracker({
           const result = await response.json();
 
           if (result.success) {
-            console.log(
-              `Visitor counted successfully for visitorId: ${visitorId}`
-            );
+            // console.log(
+            //   `Visitor counted successfully for visitorId: ${visitorId}`
+            // );
             setIsLoading(false);
             onTrackingComplete?.(true);
           } else {
