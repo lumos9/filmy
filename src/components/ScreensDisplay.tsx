@@ -1,17 +1,18 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScreensService } from "@/lib/screens.service";
+import { Database } from "@/lib/database.types";
 import { useEffect, useState } from "react";
 import { GpsPoint } from "./Map";
 import MapLibreMap from "./MapLibreMap";
 
+type Screen = Database["public"]["Tables"]["screens"]["Row"];
+
 export default function ScreensDisplay() {
   // const [page, setPage] = useState(1);
   // const [pageSize, setPageSize] = useState(25);
-  const [screens, setScreens] = useState<
-    Awaited<ReturnType<typeof ScreensService.getAllScreens>>["screens"]
-  >([]);
+  const [screens, setScreens] = useState<Screen[]>([]);
   const [screensWithValidCoords, setScreensWithValidCoords] = useState<
     GpsPoint[]
   >([]);
@@ -20,6 +21,87 @@ export default function ScreensDisplay() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("map");
   const [useMapLibre, setUseMapLibre] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Direct API call function for retry functionality
+  const fetchScreens = async () => {
+    console.log(
+      `🔄 ScreensDisplay: Fetching screens from API (attempt ${
+        retryCount + 1
+      })...`
+    );
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/screens", {
+        cache: "force-cache",
+        next: {
+          revalidate: 24 * 60 * 60, // 24 hours
+          tags: ["screens"],
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch screens: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const result = await response.json();
+      const { screens, totalCount } = result;
+
+      console.log(
+        `📦 ScreensDisplay: Successfully loaded ${screens?.length || 0} screens`
+      );
+      setScreens(screens || []);
+
+      const screensWithCoords = (screens || [])
+        .filter(
+          (screen: Screen) =>
+            typeof screen.latitude === "number" &&
+            typeof screen.longitude === "number"
+        )
+        .map((screen: Screen) => ({
+          id: screen.id,
+          coordinates: [
+            screen.longitude as number,
+            screen.latitude as number,
+          ] as [number, number],
+          metadata: {
+            name: screen.organization || "Unknown",
+            description: [screen.city, screen.state, screen.country]
+              .filter(Boolean)
+              .join(", "),
+            projections: screen.projections || [],
+            screenType: screen.screen_type || "",
+            screenSizeFt: screen.screen_size_ft || "",
+            formats: screen.formats || [],
+            opened: screen.opened_date ? new Date(screen.opened_date) : null,
+          },
+          nickname: classifyImax(screen.formats || []),
+        }));
+
+      setScreensWithValidCoords(screensWithCoords);
+      setTotalCount(totalCount || 0);
+      setRetryCount(0); // Reset retry count on success
+
+      console.log(
+        `📍 ScreensDisplay: Processed ${screensWithCoords.length} screens with valid coordinates out of ${screens.length} total`
+      );
+    } catch (error) {
+      console.error("❌ ScreensDisplay: Failed to load screens:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to load screens data. Please try again.";
+      setError(errorMessage);
+      setRetryCount((prev) => prev + 1);
+    } finally {
+      setIsLoading(false);
+      console.log("✅ ScreensDisplay: Loading completed");
+    }
+  };
 
   function classifyImax(
     formats: string[]
@@ -36,76 +118,46 @@ export default function ScreensDisplay() {
     return "Other";
   }
 
-  useEffect(
-    () => {
-      let isMounted = true;
-      setIsLoading(true);
-      setError(null);
-
-      ScreensService.getAllScreens()
-        .then(({ screens, totalCount }) => {
-          if (!isMounted) return;
-          setScreens(screens);
-          const screensWithCoords = screens
-            .filter(
-              (screen) =>
-                typeof screen.latitude === "number" &&
-                typeof screen.longitude === "number"
-            )
-            .map((screen) => ({
-              id: screen.id,
-              coordinates: [
-                screen.longitude as number,
-                screen.latitude as number,
-              ] as [number, number],
-              metadata: {
-                name: screen.organization || "Unknown",
-                description: [screen.city, screen.state, screen.country]
-                  .filter(Boolean)
-                  .join(", "),
-                projections: screen.projections || [],
-                screenType: screen.screen_type || "",
-                screenSizeFt: screen.screen_size_ft || "",
-                formats: screen.formats || [],
-                opened: screen.opened_date
-                  ? new Date(screen.opened_date)
-                  : null,
-              },
-              nickname: classifyImax(screen.formats || []),
-            }));
-          setScreensWithValidCoords(screensWithCoords);
-          setTotalCount(totalCount || 0);
-          console.log(
-            `Loaded ${screens.length} screens with valid coords ${screensWithCoords.length}`
-          );
-        })
-        .catch((e) => {
-          if (!isMounted) return;
-          setError(e?.message || "Failed to load screens");
-        })
-        .finally(() => {
-          if (!isMounted) return;
-          setIsLoading(false);
-        });
-
-      return () => {
-        isMounted = false;
-      };
-    },
-    [
-      /* page, pageSize */
-    ]
-  );
+  useEffect(() => {
+    fetchScreens();
+  }, []); // Only run once on mount
 
   if (error) {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Screens</CardTitle>
+          <div className="text-6xl mb-4">⚠️</div>
+          <CardTitle className="text-2xl">Unable to Load Screens</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
-          <p className="text-destructive">{error}</p>
-          {/* <Button onClick={() => setPage(1)}>Retry</Button> */}
+          <p className="text-destructive mb-4">{error}</p>
+          {retryCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Failed attempts: {retryCount}
+            </p>
+          )}
+          <div className="flex gap-2 justify-center">
+            <Button
+              onClick={fetchScreens}
+              disabled={isLoading}
+              variant="default"
+            >
+              {isLoading ? "Retrying..." : "Retry"}
+            </Button>
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              disabled={isLoading}
+            >
+              Refresh Page
+            </Button>
+          </div>
+          {retryCount > 2 && (
+            <p className="text-xs text-muted-foreground mt-4">
+              If the problem persists, please check your internet connection or
+              try again later.
+            </p>
+          )}
         </CardContent>
       </Card>
     );
@@ -131,70 +183,26 @@ export default function ScreensDisplay() {
   }
 
   return (
-    <div className="w-full md:container ms:mx-auto flex flex-col gap-4">
-      <div className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-3xl font-semibold">IMAX Screens</h1>
-        {/* <button
-          onClick={() => setUseMapLibre(!useMapLibre)}
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Switch to {useMapLibre ? "Mapbox" : "MapLibre"}
-        </button> */}
-      </div>
-      {/* <Tabs
-        value={tab}
-        onValueChange={setTab}
-        className="w-full flex flex-col items-center justify-center"
-      >
-        <TabsList className="max-w-md flex justify-center items-center gap-2">
-          <TabsTrigger
-            value="map"
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <MapPin className="w-4 h-4" />
-            Map View
-          </TabsTrigger>
-          <TabsTrigger
-            value="list"
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <List className="w-4 h-4" />
-            List View
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent
-          value="map"
-          forceMount
-          className={`w-full mt-4 ${tab === "map" ? "block" : "hidden"}`}
-        >
-          <Map gpsPoints={screensWithValidCoords} />
-        </TabsContent>
-
-        <TabsContent
-          value="list"
-          forceMount
-          className={`w-full mt-4 ${tab === "list" ? "block" : "hidden"}`}
-        >
-          {isLoading ? (
-            <Card className="w-full p-6">
-              <div className="space-y-2">
-                <div className="h-6 w-48 bg-muted rounded" />
-                <div className="h-6 w-64 bg-muted rounded" />
-              </div>
-              <div className="mt-6 h-64 w-full bg-muted rounded" />
-            </Card>
-          ) : (
-            <div className="w-full flex flex-col items-center justify-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Showing {formatNumberHuman(screens.length)} screen locations
-              </div>
-              <ScreensTableV2 screenData={screens} />
+    <div className="w-full md:container ms:mx-auto flex flex-col md:gap-4 gap-2">
+      <h1 className="text-3xl font-semibold">IMAX Screens</h1>
+      {isLoading ? (
+        <Card className="w-full p-8">
+          <div className="space-y-4 text-center">
+            <div className="text-6xl mb-4">🌍</div>
+            <div className="space-y-2">
+              <div className="h-6 w-64 bg-muted rounded mx-auto" />
+              <div className="h-4 w-48 bg-muted rounded mx-auto" />
             </div>
-          )}
-        </TabsContent>
-      </Tabs> */}
-      {/* <Map gpsPoints={screensWithValidCoords} /> */}
-      <MapLibreMap gpsPoints={screensWithValidCoords} />
+            <div className="mt-8 h-96 w-full bg-muted rounded animate-pulse flex items-center justify-center">
+              <div className="text-muted-foreground">
+                Loading interactive globe...
+              </div>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <MapLibreMap gpsPoints={screensWithValidCoords} />
+      )}
     </div>
   );
 }
