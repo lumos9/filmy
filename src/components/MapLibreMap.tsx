@@ -522,15 +522,15 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
       {/* Descriptive text - always show at top when points available */}
       {hasPoints && (
-        <div className="text-center space-y-2">
-          <div className="text-sm text-muted-foreground font-medium">
+        <div className="text-xs text-muted-foreground opacity-75 flex flex-col items-center justify-center">
+          <div className="font-medium">
             {activeFilter === "All"
               ? `Displaying ${formatNumberHuman(
                   gpsPoints.length
                 )} IMAX theaters worldwide`
               : `${CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}`}
           </div>
-          <div className="text-xs text-muted-foreground opacity-75 flex items-center justify-center gap-1">
+          <div className="opacity-75 flex items-center justify-center gap-1">
             <span>🌍</span>
             <span>
               Interactive 3D globe • Click any point for theater details
