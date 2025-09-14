@@ -1,7 +1,6 @@
 "use client";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import VisitorTracker from "@/components/VisitorTracker";
 import { Film, Globe, Sparkles } from "lucide-react";
@@ -22,7 +21,7 @@ function VisitorCount() {
         if (!res.ok) throw new Error("Failed to fetch visitor count");
 
         const data = await res.json();
-        console.log("Fetched unique visitor count:", data);
+        //console.log("Fetched unique visitor count:", data);
         setUniqueCount(data.uniqueVisitors);
       } catch (error) {
         console.error("Error fetching visitor count:", error);
@@ -47,11 +46,19 @@ function VisitorCount() {
   }
 
   return (
-    <Badge variant="secondary" className="animate-pulse text-sm">
+    // <Badge variant="secondary" className="w-full text-sm md:w-auto">
+    //   <div className="break-words">
+    //     {uniqueCount.toLocaleString()} unique{" "}
+    //     {uniqueCount === 1 ? "explorer" : "explorers"} uncovered cinema's soul
+    //     in last 7 days <Globe className="w-4 h-4 ml-1 inline" />
+    //   </div>
+    // </Badge>
+    <div className="rounded-lg text-sm w-full p-2 text-white">
+      <Globe className="w-4 h-4 mr-1 inline" />
       {uniqueCount.toLocaleString()} unique{" "}
       {uniqueCount === 1 ? "explorer" : "explorers"} uncovered cinema's soul in
-      last 7 days <Globe className="w-4 h-4 ml-1 inline" />
-    </Badge>
+      last 7 days
+    </div>
   );
 }
 
@@ -82,8 +89,8 @@ export default function Home() {
       {/* Hero content */}
       <main className="relative z-20 flex flex-col items-center justify-center text-center px-4 py-24 gap-8 w-full">
         <div className="flex flex-col items-center gap-4">
-          <span className="inline-flex items-center gap-2 text-primary font-bold text-4xl md:text-6xl tracking-tight drop-shadow-lg animate-pop">
-            <Film className="w-8 h-8 md:w-12 md:h-12 text-primary animate-pop" />
+          <span className="inline-flex items-center gap-2 text-white font-bold text-4xl md:text-6xl tracking-tight drop-shadow-lg animate-pop">
+            <Film className="w-8 h-8 md:w-12 md:h-12 text-white animate-pop" />
             Filmy
           </span>
           <h1 className="text-2xl md:text-4xl font-extrabold text-white max-w-3xl animate-fade-in">

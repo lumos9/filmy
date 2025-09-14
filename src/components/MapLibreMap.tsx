@@ -119,7 +119,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
   useEffect(() => {
     setMounted(true);
-    console.log("MapLibre: Component mounted, theme:", theme);
+    //console.log("MapLibre: Component mounted, theme:", theme);
 
     // Safety fallback - if we're stuck in INITIALIZING for too long, force progress
     const safetyTimeout = setTimeout(() => {
@@ -300,7 +300,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
     if (gpsPoints.length > 0) {
       console.log(
-        `📍 GPS POINTS RECEIVED: ${gpsPoints.length} IMAX locations received from parent component!`
+        `📍 GPS POINTS RECEIVED: ${gpsPoints.length} IMAX locations received!`
       );
 
       // Add points to map if map is ready
@@ -315,11 +315,11 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
             features: getFeatures(gpsPoints),
           };
           source.setData(data);
-          console.log("MapLibre: Updated existing points source");
+          //console.log("MapLibre: Updated existing points source");
           setLoadingState(LoadingState.COMPLETE);
         } else {
           // Create new source and layer
-          console.log("MapLibre: Creating points layer with GPS data");
+          //console.log("MapLibre: Creating points layer with GPS data");
           addPointsLayer(mapRef.current, gpsPoints);
           setupMapEventHandlers(mapRef.current);
           setLoadingState(LoadingState.COMPLETE);
@@ -382,7 +382,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     setLoadingState(LoadingState.MAP_LOADING);
 
     const isMobile = window.innerWidth < 768;
-    const initialZoom = isMobile ? 1 : 2.5;
+    const initialZoom = isMobile ? 1 : 1.75;
 
     mapRef.current = new maplibre.Map({
       container: mapContainer.current,
@@ -522,7 +522,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
 
       {/* Descriptive text - always show at top when points available */}
       {hasPoints && (
-        <div className="text-xs text-muted-foreground opacity-75 flex flex-col items-center justify-center">
+        <div className="text-xs text-muted-foreground flex flex-col items-center justify-center">
           <div className="font-medium">
             {activeFilter === "All"
               ? `Displaying ${formatNumberHuman(
@@ -530,7 +530,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
                 )} IMAX theaters worldwide`
               : `${CAT_DESCRIPTIONS[activeFilter as GpsPoint["nickname"]]}`}
           </div>
-          <div className="opacity-75 flex items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-1">
             <span>🌍</span>
             <span>
               Interactive 3D globe • Click any point for theater details
@@ -543,7 +543,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       <div className="relative w-full h-[400px] md:h-[650px] rounded-lg overflow-hidden border border-border/20">
         <div
           ref={mapContainer}
-          className="w-full h-full rounded-lg"
+          className="w-full h-full rounded-lg bg-black"
           style={{ visibility: isFullyReady ? "visible" : "hidden" }}
         />
 
