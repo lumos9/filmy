@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { useEffect, useState } from "react";
 
 interface VisitorTrackerProps {
   onTrackingComplete?: (success: boolean) => void;
@@ -9,6 +10,8 @@ interface VisitorTrackerProps {
 export default function VisitorTracker({
   onTrackingComplete,
 }: VisitorTrackerProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
   // Generate a UUID-like string with fallbacks for older browsers
   const generateVisitorId = (): string => {
     // Try crypto.randomUUID() first (modern browsers)
@@ -53,6 +56,7 @@ export default function VisitorTracker({
   };
 
   useEffect(() => {
+    setIsLoading(true);
     const trackVisitor = async () => {
       try {
         // Generate or retrieve visitor ID with error handling
@@ -92,6 +96,8 @@ export default function VisitorTracker({
               `Visitor tracking failed: ${response.status} ${response.statusText}`,
               errorData
             );
+            setIsLoading(false);
+            onTrackingComplete?.(false);
             return;
           }
 
@@ -101,14 +107,17 @@ export default function VisitorTracker({
             console.log(
               `Visitor counted successfully for visitorId: ${visitorId}`
             );
+            setIsLoading(false);
             onTrackingComplete?.(true);
           } else {
             console.error("Visitor counting failed:", result);
+            setIsLoading(false);
             onTrackingComplete?.(false);
           }
         } catch (fetchError) {
           // Handle network errors, CORS issues, etc.
           console.error("Network error during visitor tracking:", fetchError);
+          setIsLoading(false);
           onTrackingComplete?.(false);
 
           // Could implement retry logic here if needed
@@ -117,6 +126,7 @@ export default function VisitorTracker({
       } catch (error) {
         // Handle any other unexpected errors
         console.error("Unexpected error in visitor tracking:", error);
+        setIsLoading(false);
         onTrackingComplete?.(false);
 
         // Ensure the app continues to function even if tracking fails
@@ -130,5 +140,16 @@ export default function VisitorTracker({
     }
   }, []);
 
-  return null;
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2">
+        <LoadingSpinner size="sm" variant="spinner" />
+        <span className="text-sm text-muted-foreground">
+          Counting unique visitor...
+        </span>
+      </div>
+    );
+  }
+
+  return null; // This component does not render anything visible
 }

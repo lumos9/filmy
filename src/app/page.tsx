@@ -47,10 +47,12 @@ function VisitorCount() {
   }
 
   return (
-    <Badge variant="secondary" className="animate-pulse text-sm">
-      {uniqueCount.toLocaleString()} unique{" "}
-      {uniqueCount === 1 ? "explorer" : "explorers"} uncovered cinema's soul in
-      last 7 days <Globe className="w-4 h-4 ml-1 inline" />
+    <Badge variant="secondary" className="w-full text-sm md:w-auto">
+      <div className="break-words">
+        {uniqueCount.toLocaleString()} unique{" "}
+        {uniqueCount === 1 ? "explorer" : "explorers"} uncovered cinema's soul
+        in last 7 days <Globe className="w-4 h-4 ml-1 inline" />
+      </div>
     </Badge>
   );
 }
