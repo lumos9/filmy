@@ -281,7 +281,7 @@ export function ContactForm() {
                 onChange={(e) => handleInputChange("message", e.target.value)}
                 required
                 rows={5}
-                className="border-border focus:ring-ring resize-none"
+                className="text-sm border-border focus:ring-ring resize-none"
               />
             </div>
 
@@ -304,7 +304,7 @@ export function ContactForm() {
             </Button>
           </form>
 
-          <div className="text-center border-t border-border/50">
+          <div className="text-center">
             <p className="text-sm text-muted-foreground">
               We typically respond within 24 hours during business days.
             </p>

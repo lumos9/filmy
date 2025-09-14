@@ -104,6 +104,24 @@ export interface Database {
         };
         Relationships: [];
       };
+      map_loads: {
+        Row: {
+          id: number;
+          count: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          count?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          count?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

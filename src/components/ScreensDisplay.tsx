@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScreensService } from "@/lib/screens.service";
 import { useEffect, useState } from "react";
-import Map, { GpsPoint } from "./Map";
+import { GpsPoint } from "./Map";
+import MapLibreMap from "./MapLibreMap";
 
 export default function ScreensDisplay() {
   // const [page, setPage] = useState(1);
@@ -18,6 +19,7 @@ export default function ScreensDisplay() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("map");
+  const [useMapLibre, setUseMapLibre] = useState(false);
 
   function classifyImax(
     formats: string[]
@@ -73,6 +75,9 @@ export default function ScreensDisplay() {
             }));
           setScreensWithValidCoords(screensWithCoords);
           setTotalCount(totalCount || 0);
+          console.log(
+            `Loaded ${screens.length} screens with valid coords ${screensWithCoords.length}`
+          );
         })
         .catch((e) => {
           if (!isMounted) return;
@@ -129,6 +134,12 @@ export default function ScreensDisplay() {
     <div className="w-full md:container ms:mx-auto flex flex-col gap-4">
       <div className="flex flex-col items-center justify-center text-center">
         <h1 className="text-3xl font-semibold">IMAX Screens</h1>
+        {/* <button
+          onClick={() => setUseMapLibre(!useMapLibre)}
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Switch to {useMapLibre ? "Mapbox" : "MapLibre"}
+        </button> */}
       </div>
       {/* <Tabs
         value={tab}
@@ -182,7 +193,8 @@ export default function ScreensDisplay() {
           )}
         </TabsContent>
       </Tabs> */}
-      <Map gpsPoints={screensWithValidCoords} />
+      {/* <Map gpsPoints={screensWithValidCoords} /> */}
+      <MapLibreMap gpsPoints={screensWithValidCoords} />
     </div>
   );
 }
