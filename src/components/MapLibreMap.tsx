@@ -382,7 +382,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
     setLoadingState(LoadingState.MAP_LOADING);
 
     const isMobile = window.innerWidth < 768;
-    const initialZoom = isMobile ? 1 : 2.5;
+    const initialZoom = isMobile ? 1 : 1.75;
 
     mapRef.current = new maplibre.Map({
       container: mapContainer.current,
@@ -543,7 +543,7 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
       <div className="relative w-full h-[400px] md:h-[650px] rounded-lg overflow-hidden border border-border/20">
         <div
           ref={mapContainer}
-          className="w-full h-full rounded-lg"
+          className="w-full h-full rounded-lg bg-black"
           style={{ visibility: isFullyReady ? "visible" : "hidden" }}
         />
 

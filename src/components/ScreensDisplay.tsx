@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database } from "@/lib/database.types";
@@ -186,20 +187,21 @@ export default function ScreensDisplay() {
     <div className="w-full md:container ms:mx-auto flex flex-col md:gap-4 gap-2">
       <h1 className="text-3xl font-semibold">IMAX Screens</h1>
       {isLoading ? (
-        <Card className="w-full p-8">
-          <div className="space-y-4 text-center">
-            <div className="text-6xl mb-4">🌍</div>
-            <div className="space-y-2">
-              <div className="h-6 w-64 bg-muted rounded mx-auto" />
-              <div className="h-4 w-48 bg-muted rounded mx-auto" />
-            </div>
-            <div className="mt-8 h-96 w-full bg-muted rounded animate-pulse flex items-center justify-center">
-              <div className="text-muted-foreground">
-                Loading interactive globe...
-              </div>
-            </div>
-          </div>
-        </Card>
+        // <Card className="w-full p-8">
+        //   <div className="space-y-4 text-center">
+        //     <div className="text-6xl mb-4">🌍</div>
+        //     <div className="space-y-2">
+        //       <div className="h-6 w-64 bg-muted rounded mx-auto" />
+        //       <div className="h-4 w-48 bg-muted rounded mx-auto" />
+        //     </div>
+        //     <div className="mt-8 h-96 w-full bg-muted rounded animate-pulse flex items-center justify-center">
+        //       <div className="text-muted-foreground">
+        //         Loading interactive globe...
+        //       </div>
+        //     </div>
+        //   </div>
+        // </Card>
+        <LoadingSpinner size="lg" variant="spinner" className="h-full" />
       ) : (
         <MapLibreMap gpsPoints={screensWithValidCoords} />
       )}
