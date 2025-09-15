@@ -153,6 +153,14 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               attribution:
                 "© Esri, HERE, Garmin, FAO, NOAA, USGS, © OpenStreetMap contributors",
             },
+            labels: {
+              type: "raster" as const,
+              tiles: [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+              ],
+              tileSize: 256,
+              attribution: "© Esri",
+            },
           },
           layers: [
             {
@@ -165,6 +173,12 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               type: "raster" as const,
               source: "natural-earth",
               paint: { "raster-opacity": 1 },
+            },
+            {
+              id: "labels",
+              type: "raster" as const,
+              source: "labels",
+              paint: { "raster-opacity": 1.0 },
             },
           ],
         }
@@ -180,18 +194,32 @@ const MapLibreMap: React.FC<{ gpsPoints: GpsPoint[] }> = ({ gpsPoints }) => {
               attribution:
                 "© Esri, Maxar, Earthstar Geographics, and the GIS User Community",
             },
+            labels: {
+              type: "raster" as const,
+              tiles: [
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+              ],
+              tileSize: 256,
+              attribution: "© Esri",
+            },
           },
           layers: [
             {
               id: "background",
               type: "background" as const,
-              paint: { "background-color": "#1e3a8a" },
+              paint: { "background-color": "#000000" },
             },
             {
               id: "natural-earth",
               type: "raster" as const,
               source: "natural-earth",
               paint: { "raster-opacity": 1 },
+            },
+            {
+              id: "labels",
+              type: "raster" as const,
+              source: "labels",
+              paint: { "raster-opacity": 0.8 },
             },
           ],
         };
