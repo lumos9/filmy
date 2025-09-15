@@ -161,6 +161,24 @@ export default function AboutPage() {
           <Separator />
           <div className="space-y-3">
             <h2 className="text-xl font-semibold text-left flex items-center justify-center gap-2">
+              <Monitor className="w-5 h-5 text-green-500" /> Privacy & Data
+            </h2>
+            <div className="text-muted-foreground text-center space-y-2">
+              <p className="text-sm">
+                <strong>We don't collect personal information.</strong> Filmy
+                operates with minimal data collection—no tracking, no accounts,
+                no stored personal data.
+              </p>
+              <p className="text-xs">
+                The only data collection comes from Vercel's standard hosting
+                analytics (page views, performance metrics). No personal
+                information is stored or processed by our application.
+              </p>
+            </div>
+          </div>
+          <Separator />
+          <div className="space-y-3">
+            <h2 className="text-xl font-semibold text-left flex items-center justify-center gap-2">
               <Mail className="w-5 h-5 text-blue-500" /> Join the Community
             </h2>
             <p className="text-muted-foreground text-center">
