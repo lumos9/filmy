@@ -29501,7 +29501,7 @@
     "country": "USA",
     "state": "CA",
     "city": "Los Angeles",
-    "organization": "IMAX Theater",
+    "organization": "California Science Center",
     "screen_type": "flat",
     "seats": 420,
     "screen_size_ft": "66.7 x 90.0 ft.",
@@ -29516,8 +29516,8 @@
     "projections": [
       "IMAX"
     ],
-    "latitude": 34.1830876,
-    "longitude": -118.5789774
+    "latitude": 34.0157,
+    "longitude": -118.2861
   },
   {
     "id": "5b32a824-81ae-45b0-b9b7-4aeb63d89281",
