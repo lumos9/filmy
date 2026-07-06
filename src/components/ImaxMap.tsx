@@ -25,24 +25,21 @@ export interface ImaxFeatureProps {
 type ImaxFeature = Feature<Point, ImaxFeatureProps>;
 type ImaxCollection = FeatureCollection<Point, ImaxFeatureProps>;
 
-const CATEGORIES = ["All", "True IMAX", "LieMAX", "Hybrid", "Other"] as const;
+const CATEGORIES = ["All", "True IMAX", "LieMAX", "Other"] as const;
 type Category = (typeof CATEGORIES)[number];
 
 const COLORS: Record<ScreenNickname, string> = {
   "True IMAX": "#1E90FF", // blue
   LieMAX: "#FF4500", // orange
-  Hybrid: "#32CD32", // green
   Other: "#FFD700", // gold
 };
 
 const CAT_DESCRIPTIONS: Record<ScreenNickname, string> = {
   "True IMAX":
-    "Full IMAX experience, typically 15/70mm film (1570) or IMAX Digital (DL/DL2), large screen & proprietary tech",
+    "Genuine large-format IMAX with 15/70mm film (1570) on a giant screen — including venues that also run digital IMAX",
   LieMAX:
-    "IMAX branding but smaller or non-IMAX-standard screens, often DL or DL2 formats",
-  Hybrid:
-    "Combination of IMAX and other projection formats; may include 1570, DL, DL2 on select screens",
-  Other: "Other or unspecified formats, e.g., non-IMAX or custom cinema setups",
+    "Digital-only IMAX (D / DL / DL2 …), no 70mm film — smaller, retrofit-style IMAX screens",
+  Other: "No recognized IMAX format, e.g. legacy, dome, or non-IMAX large-format setups",
 };
 
 // Esri raster basemaps — satellite in light mode, dark-gray canvas in dark mode.
@@ -87,8 +84,6 @@ const COLOR_MATCH: maplibre.ExpressionSpecification = [
   COLORS["True IMAX"],
   "LieMAX",
   COLORS["LieMAX"],
-  "Hybrid",
-  COLORS["Hybrid"],
   COLORS["Other"], // default
 ];
 
@@ -275,7 +270,6 @@ export default function ImaxMap({ data }: { data: ImaxCollection }) {
       All: data.features.length,
       "True IMAX": 0,
       LieMAX: 0,
-      Hybrid: 0,
       Other: 0,
     };
     for (const f of data.features) c[f.properties.nickname]++;

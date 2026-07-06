@@ -4,11 +4,10 @@
 
 export function classifyImax(formats) {
   if (!formats || formats.length === 0) return "Other";
-  const has1570 = formats.includes("1570");
-  const hasDigital = formats.some((f) => f.startsWith("D"));
-  if (has1570 && hasDigital) return "Hybrid";
-  if (has1570) return "True IMAX";
-  if (hasDigital) return "LieMAX";
+  // Any 15/70mm film (1570) = genuine large-format IMAX, regardless of whether a
+  // digital projector is also present. Digital-only = LieMAX. Neither = Other.
+  if (formats.includes("1570")) return "True IMAX";
+  if (formats.some((f) => f.startsWith("D"))) return "LieMAX";
   return "Other";
 }
 

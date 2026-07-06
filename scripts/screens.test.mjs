@@ -20,11 +20,12 @@ const geojson = JSON.parse(
   readFileSync(resolve(__dirname, "../public/screens.geojson"), "utf8")
 );
 
-const NICKNAMES = new Set(["True IMAX", "LieMAX", "Hybrid", "Other"]);
+const NICKNAMES = new Set(["True IMAX", "LieMAX", "Other"]);
 
 test("classifyImax maps formats to the right category", () => {
   assert.equal(classifyImax(["1570"]), "True IMAX");
-  assert.equal(classifyImax(["1570", "D"]), "Hybrid");
+  // 15/70mm film + digital is still True IMAX (not a separate 'Hybrid').
+  assert.equal(classifyImax(["1570", "D"]), "True IMAX");
   assert.equal(classifyImax(["DL2"]), "LieMAX");
   assert.equal(classifyImax(["D"]), "LieMAX");
   assert.equal(classifyImax(["870"]), "Other");
