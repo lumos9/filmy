@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { classifyImax, isValidCoord } from "./lib/screens-core.mjs";
+import { classifyType, isGiant, isValidCoord } from "./lib/screens-core.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC = resolve(__dirname, "../src/data/screens.json");
@@ -34,7 +34,8 @@ function main() {
         id: s.id,
         name: s.organization || "Unknown",
         description,
-        nickname: classifyImax(s.formats),
+        category: classifyType(s.formats),
+        giant: isGiant(s.screen_size_ft),
         screenType: s.screen_type || "",
         screenSizeFt: s.screen_size_ft || "",
         formats: (s.formats || []).join(", "),
