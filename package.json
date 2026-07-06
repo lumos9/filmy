@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "npm run data:geojson && next dev",
     "build": "next build",
-    "prebuild": "npm run data:geojson",
+    "prebuild": "npm run data:geojson && npm run data:cameras",
     "start": "next start",
     "data:import": "node scripts/import-backup.mjs",
     "data:geojson": "node scripts/build-geojson.mjs",
     "data:fetch": "node scripts/fetch-imax.mjs",
+    "data:cameras": "node scripts/scrape-cameras.mjs",
     "test": "node --test \"scripts/**/*.test.mjs\""
   },
   "dependencies": {

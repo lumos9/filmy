@@ -1,10 +1,24 @@
 import { NextResponse, NextRequest } from "next/server";
 import { searchMovieByTitle } from "@/lib/tmdb";
 import { CAMERA_MOVIES } from "@/lib/camerasAndMovies";
+import scrapedData from "@/data/camera-movies.scraped.json";
 
-// Simple in-memory cache
+// Latest films-per-camera scraped from ShotOnWhat at build time (regenerated on
+// each deploy). Merged as a UNION over the curated list so newly-released films
+// show up automatically, while curated titles remain a guaranteed fallback.
+const SCRAPED: Record<string, string[]> =
+  (scrapedData as { cameras?: Record<string, string[]> }).cameras ?? {};
+
+/** Curated ∪ scraped titles for a camera, de-duplicated. */
+function titlesForCamera(cameraId: string): string[] {
+  const merged = [...(CAMERA_MOVIES[cameraId] || []), ...(SCRAPED[cameraId] || [])];
+  return Array.from(new Set(merged.map((t) => t.trim()).filter(Boolean)));
+}
+
+// Simple in-memory cache. Data is static per deploy, so a long TTL just trims
+// TMDB calls; a fresh deploy (new scrape) runs in a new function instance.
 const MOVIE_CACHE: Record<string, { movies: any[]; timestamp: number }> = {};
-const CACHE_TTL = 1000 * 60 * 10; // 10 minutes
+const CACHE_TTL = 1000 * 60 * 60 * 6; // 6 hours
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,16 +29,22 @@ export async function GET(request: NextRequest) {
 
     const now = Date.now();
 
+    // Shared cache headers: cache at the edge but revalidate, so a redeploy's
+    // fresh scrape is never served stale.
+    const cacheHeaders = {
+      "Cache-Control": "public, s-maxage=21600, stale-while-revalidate=86400",
+    };
+
     // Serve from cache if available
     const cached = MOVIE_CACHE[cameraId];
     if (cached && now - cached.timestamp < CACHE_TTL) {
       console.log(
         `Returning ${cached.movies.length} cached movies for camera: '${cameraId}'`
       );
-      return NextResponse.json(cached.movies);
+      return NextResponse.json(cached.movies, { headers: cacheHeaders });
     }
 
-    const titles = CAMERA_MOVIES[cameraId] || [];
+    const titles = titlesForCamera(cameraId);
     if (!titles.length) {
       console.warn("No movie titles found for camera:", cameraId);
       return NextResponse.json([]);
@@ -77,11 +97,10 @@ export async function GET(request: NextRequest) {
     });
 
     MOVIE_CACHE[cameraId] = { movies: uniqueMovies, timestamp: now };
-    //console.log(movies);
     console.log(
       `Returning ${uniqueMovies.length} movies for camera: '${cameraId}'`
     );
-    return NextResponse.json(uniqueMovies);
+    return NextResponse.json(uniqueMovies, { headers: cacheHeaders });
   } catch (err) {
     console.error("API Error:", err);
     return NextResponse.json([], { status: 500 });
