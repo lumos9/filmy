@@ -30,7 +30,6 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tanstack/react-table": "^8.21.3",
     "@types/uuid": "^10.0.0",
-    "@upstash/redis": "^1.35.3",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.11.0",
     "checkbox": "^0.0.1",
