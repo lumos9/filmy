@@ -2,13 +2,32 @@
 // runtime (src/lib/screens.ts, screens.append.ts) keeps a TypeScript copy of this
 // same logic; scripts/screens.test.mjs asserts the two stay behaviourally in sync.
 
-export function classifyImax(formats) {
+// Screens are described along two independent axes:
+//   1. projection TYPE — Film (15/70mm) vs Digital vs Other
+//   2. a GIANT-screen flag for premier large-format halls (>= 80 ft)
+// so a digital-but-huge flagship (e.g. TCL Chinese, 94 ft) reads as "Digital"
+// AND "giant" rather than being forced into a subjective true/lie bucket.
+
+export const GIANT_MIN_FT = 75;
+
+export function classifyType(formats) {
   if (!formats || formats.length === 0) return "Other";
-  // Any 15/70mm film (1570) = genuine large-format IMAX, regardless of whether a
-  // digital projector is also present. Digital-only = LieMAX. Neither = Other.
-  if (formats.includes("1570")) return "True IMAX";
-  if (formats.some((f) => f.startsWith("D"))) return "LieMAX";
+  if (formats.includes("1570")) return "Film"; // 15/70mm film
+  if (formats.some((f) => f.startsWith("D"))) return "Digital"; // D / DL / DL2 …
   return "Other";
+}
+
+/** Largest numeric dimension (ft) parsed from a screen-size string, else 0. */
+export function maxScreenFt(screenSizeFt) {
+  if (!screenSizeFt) return 0;
+  const nums = (screenSizeFt.match(/\d+(?:\.\d+)?/g) || [])
+    .map(Number)
+    .filter(Number.isFinite);
+  return nums.length ? Math.max(...nums) : 0;
+}
+
+export function isGiant(screenSizeFt) {
+  return maxScreenFt(screenSizeFt) >= GIANT_MIN_FT;
 }
 
 export function isValidCoord(lat, lng) {

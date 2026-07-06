@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Map, MapControls, MapPopup, useMap } from "@/components/ui/map";
 import { Tilt } from "@/components/unlumen-ui/tilt";
 import { formatNumberHuman } from "@/lib/utils";
-import type { ScreenNickname } from "@/lib/screens";
+import { GIANT_MIN_FT, type ScreenCategory } from "@/lib/screens";
 import type { Feature, FeatureCollection, Point } from "geojson";
-import { CalendarDays, MapPin, Ruler, X } from "lucide-react";
+import { CalendarDays, ExternalLink, MapPin, Ruler, Sparkles, X } from "lucide-react";
 import type * as maplibre from "maplibre-gl";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
@@ -15,7 +15,8 @@ export interface ImaxFeatureProps {
   id: string;
   name: string;
   description: string;
-  nickname: ScreenNickname;
+  category: ScreenCategory;
+  giant: boolean;
   screenType: string;
   screenSizeFt: string;
   formats: string;
@@ -25,21 +26,29 @@ export interface ImaxFeatureProps {
 type ImaxFeature = Feature<Point, ImaxFeatureProps>;
 type ImaxCollection = FeatureCollection<Point, ImaxFeatureProps>;
 
-const CATEGORIES = ["All", "True IMAX", "LieMAX", "Other"] as const;
+const CATEGORIES = ["All", "Film", "Digital", "Other"] as const;
 type Category = (typeof CATEGORIES)[number];
 
-const COLORS: Record<ScreenNickname, string> = {
-  "True IMAX": "#1E90FF", // blue
-  LieMAX: "#FF4500", // orange
-  Other: "#FFD700", // gold
+const LABELS: Record<Category, string> = {
+  All: "All",
+  Film: "Film · 70mm",
+  Digital: "Digital",
+  Other: "Other",
 };
 
-const CAT_DESCRIPTIONS: Record<ScreenNickname, string> = {
-  "True IMAX":
-    "Genuine large-format IMAX with 15/70mm film (1570) on a giant screen — including venues that also run digital IMAX",
-  LieMAX:
-    "Digital-only IMAX (D / DL / DL2 …), no 70mm film — smaller, retrofit-style IMAX screens",
-  Other: "No recognized IMAX format, e.g. legacy, dome, or non-IMAX large-format setups",
+const COLORS: Record<ScreenCategory, string> = {
+  Film: "#1E90FF", // blue — 15/70mm film
+  Digital: "#FF4500", // orange — digital IMAX
+  Other: "#FFD700", // gold — non-standard
+};
+
+// Giant-screen marker colour (amber ring), independent of projection type.
+const GIANT_COLOR = "#FBBF24";
+
+const CAT_DESCRIPTIONS: Record<ScreenCategory, string> = {
+  Film: "15/70mm film IMAX (1570) — genuine large-format film projection",
+  Digital: "Digital IMAX (D / DL / DL2 …) — laser or xenon digital projection",
+  Other: "No recognized IMAX format — legacy, dome, or non-IMAX setups",
 };
 
 // Esri raster basemaps — satellite in light mode, dark-gray canvas in dark mode.
@@ -79,12 +88,12 @@ const DARK_STYLE =
 
 const COLOR_MATCH: maplibre.ExpressionSpecification = [
   "match",
-  ["get", "nickname"],
-  "True IMAX",
-  COLORS["True IMAX"],
-  "LieMAX",
-  COLORS["LieMAX"],
-  COLORS["Other"], // default
+  ["get", "category"],
+  "Film",
+  COLORS.Film,
+  "Digital",
+  COLORS.Digital,
+  COLORS.Other, // default
 ];
 
 /**
@@ -94,6 +103,7 @@ const COLOR_MATCH: maplibre.ExpressionSpecification = [
  */
 const SOURCE = "imax-points";
 const LAYER = "imax-points-circles";
+const GIANT_LAYER = "imax-giant-rings";
 
 function ImaxPointsLayer({
   data,
@@ -118,23 +128,52 @@ function ImaxPointsLayer({
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     map.addSource(SOURCE, { type: "geojson", data: dataRef.current });
+
+    // Grow markers as you zoom in; slightly smaller base on mobile.
+    const dotRadius: maplibre.ExpressionSpecification = [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      1,
+      isMobile ? 3 : 4,
+      5,
+      isMobile ? 5 : 6,
+      10,
+      9,
+    ];
+
+    // Giant-screen halo: an amber ring drawn under the dots, only for >= 80ft
+    // venues — marks flagship large-format halls regardless of film/digital.
     map.addLayer({
-      id: LAYER,
+      id: GIANT_LAYER,
       type: "circle",
       source: SOURCE,
+      filter: ["==", ["get", "giant"], true],
       paint: {
-        // Grow the dots as you zoom in; slightly smaller base on mobile.
         "circle-radius": [
           "interpolate",
           ["linear"],
           ["zoom"],
           1,
-          isMobile ? 3 : 4,
+          isMobile ? 6 : 7,
           5,
-          isMobile ? 5 : 6,
+          isMobile ? 8 : 9,
           10,
-          9,
+          13,
         ],
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-stroke-width": 2,
+        "circle-stroke-color": GIANT_COLOR,
+        "circle-stroke-opacity": 0.95,
+      },
+    });
+
+    map.addLayer({
+      id: LAYER,
+      type: "circle",
+      source: SOURCE,
+      paint: {
+        "circle-radius": dotRadius,
         "circle-color": COLOR_MATCH,
         "circle-stroke-width": 1.5,
         "circle-stroke-color": "#ffffff",
@@ -166,6 +205,7 @@ function ImaxPointsLayer({
       map.off("mouseleave", LAYER, leave);
       try {
         if (map.getLayer(LAYER)) map.removeLayer(LAYER);
+        if (map.getLayer(GIANT_LAYER)) map.removeLayer(GIANT_LAYER);
         if (map.getSource(SOURCE)) map.removeSource(SOURCE);
       } catch {
         // style may be mid-reload
@@ -183,6 +223,16 @@ function ImaxPointsLayer({
   return null;
 }
 
+/**
+ * Google Maps search link for a venue. Uses name + location text so Maps
+ * resolves the real place (with its canonical name, showtimes & ticket links),
+ * even when our stored name isn't a perfect match. Opens in a new tab.
+ */
+function mapsUrl(p: ImaxFeatureProps): string {
+  const q = [p.name, p.description].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
+
 /** A pretty, tilt-animated theater info card shown inside the map popup. */
 function InfoCard({
   feature,
@@ -192,7 +242,7 @@ function InfoCard({
   onClose: () => void;
 }) {
   const p = feature.properties;
-  const color = COLORS[p.nickname];
+  const color = COLORS[p.category];
   return (
     <Tilt rotationFactor={5} className="w-64 [transform-style:preserve-3d]">
       <div className="relative overflow-hidden rounded-xl border border-border/60 bg-popover text-popover-foreground text-left shadow-2xl ring-1 ring-black/5">
@@ -208,23 +258,40 @@ function InfoCard({
           <X className="size-3.5" />
         </button>
 
-        <div className="flex flex-col gap-2.5 p-3.5">
-          <div className="flex flex-col gap-1.5 pr-6">
-            <h3 className="text-sm font-semibold leading-tight">{p.name}</h3>
-            <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-col gap-2 p-3.5">
+          <div className="flex flex-col gap-1 pr-6">
+            <a
+              href={mapsUrl(p)}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Open in Google Maps for showtimes & tickets"
+              className="group inline-flex items-start gap-1 text-sm font-semibold leading-snug hover:underline"
+            >
+              <span>{p.name}</span>
+              <ExternalLink className="mt-0.5 size-3 shrink-0 opacity-50 transition-opacity group-hover:opacity-100" />
+            </a>
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs">
               <span
-                className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
-                style={{ background: `${color}22`, color, boxShadow: `inset 0 0 0 1px ${color}55` }}
-              >
-                <span
-                  className="inline-block size-1.5 rounded-full"
-                  style={{ background: color }}
-                />
-                {p.nickname}
+                className="inline-block size-2 shrink-0 rounded-full"
+                style={{ background: color }}
+              />
+              <span className="font-medium" style={{ color }}>
+                {LABELS[p.category]}
               </span>
               {p.formats && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                  {p.formats}
+                <span className="text-muted-foreground">· {p.formats}</span>
+              )}
+              {p.giant && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                  style={{
+                    color: GIANT_COLOR,
+                    background: `${GIANT_COLOR}1f`,
+                    boxShadow: `inset 0 0 0 1px ${GIANT_COLOR}66`,
+                  }}
+                >
+                  <Sparkles className="size-2.5" />
+                  Giant screen
                 </span>
               )}
             </div>
@@ -260,29 +327,35 @@ function InfoRow({
 
 export default function ImaxMap({ data }: { data: ImaxCollection }) {
   const [activeFilter, setActiveFilter] = useState<Category>("All");
+  const [giantOnly, setGiantOnly] = useState(false);
   const [selected, setSelected] = useState<ImaxFeature | null>(null);
 
   const initialZoom =
     typeof window !== "undefined" && window.innerWidth < 768 ? 1 : 1.75;
 
-  const counts = useMemo(() => {
+  const { counts, giantCount } = useMemo(() => {
     const c: Record<Category, number> = {
       All: data.features.length,
-      "True IMAX": 0,
-      LieMAX: 0,
+      Film: 0,
+      Digital: 0,
       Other: 0,
     };
-    for (const f of data.features) c[f.properties.nickname]++;
-    return c;
+    let g = 0;
+    for (const f of data.features) {
+      c[f.properties.category]++;
+      if (f.properties.giant) g++;
+    }
+    return { counts: c, giantCount: g };
   }, [data]);
 
   const filtered = useMemo<ImaxCollection>(() => {
-    if (activeFilter === "All") return data;
-    return {
-      type: "FeatureCollection",
-      features: data.features.filter((f) => f.properties.nickname === activeFilter),
-    };
-  }, [data, activeFilter]);
+    let feats = data.features;
+    if (activeFilter !== "All") {
+      feats = feats.filter((f) => f.properties.category === activeFilter);
+    }
+    if (giantOnly) feats = feats.filter((f) => f.properties.giant);
+    return { type: "FeatureCollection", features: feats };
+  }, [data, activeFilter, giantOnly]);
 
   return (
     <div className="w-full flex flex-col gap-2 items-center justify-center">
@@ -293,12 +366,12 @@ export default function ImaxMap({ data }: { data: ImaxCollection }) {
         .maplibregl-ctrl-logo { display: none !important; }
       `}</style>
 
-      {/* Filter badges */}
+      {/* Filter badges: projection type (exclusive) + a giant-screen toggle */}
       <div className="flex flex-row gap-2 flex-wrap justify-center items-center">
         {CATEGORIES.map((cat) => {
           const isActive = activeFilter === cat;
           const borderColor =
-            cat === "All" ? "#666666" : COLORS[cat as ScreenNickname];
+            cat === "All" ? "#666666" : COLORS[cat as ScreenCategory];
           const allStripe =
             "repeating-linear-gradient(135deg, #444 0, #444 8px, #666 8px, #666 16px)";
           return (
@@ -314,22 +387,43 @@ export default function ImaxMap({ data }: { data: ImaxCollection }) {
               }}
               onClick={() => setActiveFilter(cat)}
             >
-              {cat} ({formatNumberHuman(counts[cat])})
+              {LABELS[cat]} ({formatNumberHuman(counts[cat])})
             </Badge>
           );
         })}
+
+        {/* Giant-screen toggle (orthogonal to type) */}
+        <Badge
+          variant="outline"
+          className="cursor-pointer transition-all duration-200 hover:scale-105 inline-flex items-center gap-1"
+          style={{
+            borderColor: GIANT_COLOR,
+            color: giantOnly ? "#1a1a1a" : GIANT_COLOR,
+            background: giantOnly ? GIANT_COLOR : "transparent",
+          }}
+          onClick={() => setGiantOnly((v) => !v)}
+        >
+          <Sparkles className="size-3" />
+          Giant ≥{GIANT_MIN_FT}ft ({formatNumberHuman(giantCount)})
+        </Badge>
       </div>
 
       {/* Descriptive text */}
       <div className="text-xs text-muted-foreground flex flex-col items-center justify-center">
         <div className="font-medium text-center px-2">
           {activeFilter === "All"
-            ? `Displaying ${formatNumberHuman(counts.All)} IMAX theaters worldwide`
-            : CAT_DESCRIPTIONS[activeFilter as ScreenNickname]}
+            ? `Displaying ${formatNumberHuman(filtered.features.length)} IMAX theaters${giantOnly ? ` with giant screens (≥${GIANT_MIN_FT}ft)` : " worldwide"}`
+            : CAT_DESCRIPTIONS[activeFilter as ScreenCategory]}
         </div>
-        <div className="flex items-center justify-center gap-1">
-          <span>🌍</span>
-          <span>Interactive 3D globe • Tap any point for theater details</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+          <span className="flex items-center gap-1">
+            <span
+              className="inline-block size-2.5 rounded-full border"
+              style={{ borderColor: GIANT_COLOR, borderWidth: 2 }}
+            />
+            <span>amber ring = giant screen ≥{GIANT_MIN_FT}ft</span>
+          </span>
+          <span>• Tap any point for details</span>
         </div>
       </div>
 

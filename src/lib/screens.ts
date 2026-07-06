@@ -12,7 +12,10 @@ import rawScreens from "@/data/screens.json";
 
 export type Screen = Database["public"]["Tables"]["screens"]["Row"];
 
-export type ScreenNickname = "True IMAX" | "LieMAX" | "Other";
+export type ScreenCategory = "Film" | "Digital" | "Other";
+
+/** Screens described independently by projection type and a giant-screen flag. */
+export const GIANT_MIN_FT = 75;
 
 /** Result of validating an arbitrary list of candidate rows. */
 export interface ValidationResult {
@@ -138,12 +141,25 @@ export function loadScreens(): Screen[] {
   return valid;
 }
 
-/** Classify a screen into the map's colour categories from its formats. */
-export function classifyImax(formats: string[] | null | undefined): ScreenNickname {
+/** Classify a screen by projection type from its formats. */
+export function classifyType(
+  formats: string[] | null | undefined
+): ScreenCategory {
   if (!formats || formats.length === 0) return "Other";
-  // Any 15/70mm film (1570) = genuine large-format IMAX, regardless of whether a
-  // digital projector is also present. Digital-only = LieMAX. Neither = Other.
-  if (formats.includes("1570")) return "True IMAX";
-  if (formats.some((f) => f.startsWith("D"))) return "LieMAX";
+  if (formats.includes("1570")) return "Film"; // 15/70mm film
+  if (formats.some((f) => f.startsWith("D"))) return "Digital"; // D / DL / DL2 …
   return "Other";
+}
+
+/** Largest numeric dimension (ft) parsed from a screen-size string, else 0. */
+export function maxScreenFt(screenSizeFt: string | null | undefined): number {
+  if (!screenSizeFt) return 0;
+  const nums = (screenSizeFt.match(/\d+(?:\.\d+)?/g) || [])
+    .map(Number)
+    .filter(Number.isFinite);
+  return nums.length ? Math.max(...nums) : 0;
+}
+
+export function isGiant(screenSizeFt: string | null | undefined): boolean {
+  return maxScreenFt(screenSizeFt) >= GIANT_MIN_FT;
 }

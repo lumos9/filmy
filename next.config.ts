@@ -4,14 +4,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // The derived map data is content-stable between rebuilds; cache it hard
-        // so the browser/CDN never re-fetches it within the window.
+        // The derived map data changes on every redeploy, so cache it but always
+        // revalidate: the browser sends a conditional GET and gets a cheap 304
+        // when unchanged, yet picks up new data immediately after a deploy
+        // (no stale classification).
         source: "/screens.geojson",
         headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=3600, stale-while-revalidate=86400",
-          },
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
         ],
       },
     ];

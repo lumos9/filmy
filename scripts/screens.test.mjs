@@ -5,7 +5,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import {
-  classifyImax,
+  classifyType,
+  maxScreenFt,
+  isGiant,
   isValidCoord,
   normalizeName,
   dedupeKey,
@@ -20,17 +22,29 @@ const geojson = JSON.parse(
   readFileSync(resolve(__dirname, "../public/screens.geojson"), "utf8")
 );
 
-const NICKNAMES = new Set(["True IMAX", "LieMAX", "Other"]);
+const CATEGORIES = new Set(["Film", "Digital", "Other"]);
 
-test("classifyImax maps formats to the right category", () => {
-  assert.equal(classifyImax(["1570"]), "True IMAX");
-  // 15/70mm film + digital is still True IMAX (not a separate 'Hybrid').
-  assert.equal(classifyImax(["1570", "D"]), "True IMAX");
-  assert.equal(classifyImax(["DL2"]), "LieMAX");
-  assert.equal(classifyImax(["D"]), "LieMAX");
-  assert.equal(classifyImax(["870"]), "Other");
-  assert.equal(classifyImax([]), "Other");
-  assert.equal(classifyImax(null), "Other");
+test("classifyType maps formats to projection type", () => {
+  assert.equal(classifyType(["1570"]), "Film");
+  // 15/70mm film + a digital projector is still Film.
+  assert.equal(classifyType(["1570", "D"]), "Film");
+  assert.equal(classifyType(["DL2"]), "Digital");
+  assert.equal(classifyType(["D"]), "Digital");
+  assert.equal(classifyType(["870"]), "Other");
+  assert.equal(classifyType([]), "Other");
+  assert.equal(classifyType(null), "Other");
+});
+
+test("maxScreenFt / isGiant parse screen sizes", () => {
+  assert.equal(maxScreenFt("46.0 x 94.0 ft."), 94);
+  assert.equal(maxScreenFt("78.8 ft."), 78.8);
+  assert.equal(maxScreenFt(""), 0);
+  assert.equal(maxScreenFt(null), 0);
+  assert.equal(isGiant("46.0 x 94.0 ft."), true); // TCL Chinese
+  assert.equal(isGiant("27.0 x 50.0 ft."), false); // small multiplex
+  assert.equal(isGiant("58.2 x 79.0 ft."), true); // Universal CityWalk (79ft)
+  assert.equal(isGiant("75.0 ft."), true); // boundary (>= 75)
+  assert.equal(isGiant("60.0 x 74.0 ft."), false); // just under
 });
 
 test("isValidCoord range-checks lat/lng", () => {
@@ -71,7 +85,8 @@ test("derived geojson matches raw + is well-formed", () => {
     assert.equal(f.geometry.type, "Point");
     const [lng, lat] = f.geometry.coordinates;
     assert.ok(isValidCoord(lat, lng));
-    assert.ok(NICKNAMES.has(f.properties.nickname));
+    assert.ok(CATEGORIES.has(f.properties.category));
+    assert.equal(typeof f.properties.giant, "boolean");
     assert.equal(typeof f.properties.id, "string");
     assert.equal(typeof f.properties.name, "string");
   }

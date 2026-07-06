@@ -11,7 +11,9 @@ export type ImaxCollection = FeatureCollection<Point, ImaxFeatureProps>;
 let cachedPromise: Promise<ImaxCollection> | null = null;
 
 async function fetchScreensData(): Promise<ImaxCollection> {
-  const res = await fetch("/screens.geojson", { cache: "force-cache" });
+  // "no-cache" = still cached on disk, but revalidated via ETag on each load
+  // (conditional GET → 304 when unchanged). Fresh after a deploy, cheap otherwise.
+  const res = await fetch("/screens.geojson", { cache: "no-cache" });
   if (!res.ok) {
     throw new Error(`Failed to load map data: ${res.status} ${res.statusText}`);
   }
