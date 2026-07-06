@@ -6,16 +6,24 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // The Supabase-backed auth is retired. When its env vars are absent (or a
+  // transient error occurs) the middleware must stay a pass-through rather than
+  // 500 every route — the app has no auth-gated features.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return supabaseResponse
+  }
+
+  try {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -24,11 +32,13 @@ export async function middleware(request: NextRequest) {
           )
         },
       },
-    }
-  )
+    })
 
-  // Refresh session if expired - required for Server Components
-  await supabase.auth.getUser()
+    // Refresh session if expired - required for Server Components
+    await supabase.auth.getUser()
+  } catch (error) {
+    console.error('middleware: skipping Supabase session refresh:', error)
+  }
 
   return supabaseResponse
 }

@@ -1,210 +1,122 @@
 "use client";
 
-import LoadingSpinner from "@/components/LoadingSpinner";
+import ImaxMap from "@/components/ImaxMap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database } from "@/lib/database.types";
+import { ShimmerSkeleton } from "@/components/unlumen-ui/shimmer-skeleton";
+import { ShimmeringText } from "@/components/unlumen-ui/shimmering-text";
+import { getScreensData, type ImaxCollection } from "@/lib/screens-data";
 import { useEffect, useState } from "react";
-import { GpsPoint } from "./Map";
-import MapLibreMap from "./MapLibreMap";
-
-type Screen = Database["public"]["Tables"]["screens"]["Row"];
 
 export default function ScreensDisplay() {
-  // const [page, setPage] = useState(1);
-  // const [pageSize, setPageSize] = useState(25);
-  const [screens, setScreens] = useState<Screen[]>([]);
-  const [screensWithValidCoords, setScreensWithValidCoords] = useState<
-    GpsPoint[]
-  >([]);
-  const [totalCount, setTotalCount] = useState(0);
+  const [data, setData] = useState<ImaxCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState("map");
-  const [useMapLibre, setUseMapLibre] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  // Direct API call function for retry functionality
-  const fetchScreens = async () => {
-    console.log(
-      `🔄 ScreensDisplay: Fetching screens from API (attempt ${
-        retryCount + 1
-      })...`
-    );
+  // Data is a prebuilt GeoJSON file (derived from src/data/screens.json), served
+  // statically from /public and de-duplicated through a module-level cache so it
+  // is fetched at most once per session. No database.
+  const load = async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      const response = await fetch("/api/screens", {
-        cache: "force-cache",
-        next: {
-          revalidate: 24 * 60 * 60, // 24 hours
-          tags: ["screens"],
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch screens: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const result = await response.json();
-      const { screens, totalCount } = result;
-
-      console.log(
-        `📦 ScreensDisplay: Successfully loaded ${screens?.length || 0} screens`
-      );
-      setScreens(screens || []);
-
-      const screensWithCoords = (screens || [])
-        .filter(
-          (screen: Screen) =>
-            typeof screen.latitude === "number" &&
-            typeof screen.longitude === "number"
-        )
-        .map((screen: Screen) => ({
-          id: screen.id,
-          coordinates: [
-            screen.longitude as number,
-            screen.latitude as number,
-          ] as [number, number],
-          metadata: {
-            name: screen.organization || "Unknown",
-            description: [screen.city, screen.state, screen.country]
-              .filter(Boolean)
-              .join(", "),
-            projections: screen.projections || [],
-            screenType: screen.screen_type || "",
-            screenSizeFt: screen.screen_size_ft || "",
-            formats: screen.formats || [],
-            opened: screen.opened_date ? new Date(screen.opened_date) : null,
-          },
-          nickname: classifyImax(screen.formats || []),
-        }));
-
-      setScreensWithValidCoords(screensWithCoords);
-      setTotalCount(totalCount || 0);
-      setRetryCount(0); // Reset retry count on success
-
-      console.log(
-        `📍 ScreensDisplay: Processed ${screensWithCoords.length} screens with valid coordinates out of ${screens.length} total`
-      );
-    } catch (error) {
-      console.error("❌ ScreensDisplay: Failed to load screens:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to load screens data. Please try again.";
-      setError(errorMessage);
+      setData(await getScreensData());
+      setRetryCount(0);
+    } catch (err) {
+      console.error("❌ ScreensDisplay: failed to load screens:", err);
+      setError(err instanceof Error ? err.message : "Failed to load screens data.");
       setRetryCount((prev) => prev + 1);
     } finally {
       setIsLoading(false);
-      console.log("✅ ScreensDisplay: Loading completed");
     }
   };
 
-  function classifyImax(
-    formats: string[]
-  ): "True IMAX" | "LieMAX" | "Hybrid" | "Other" {
-    if (!formats || formats.length === 0) return "Other";
-
-    const has1570 = formats.includes("1570");
-    const hasDigital = formats.some((f) => f.startsWith("D")); // D, DL, DL2, etc.
-
-    if (has1570 && hasDigital) return "Hybrid";
-    if (has1570) return "True IMAX";
-    if (hasDigital) return "LieMAX";
-
-    return "Other";
-  }
-
   useEffect(() => {
-    fetchScreens();
-  }, []); // Only run once on mount
+    load();
+  }, []);
 
   if (error) {
     return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader className="text-center">
-          <div className="text-6xl mb-4">⚠️</div>
-          <CardTitle className="text-2xl">Unable to Load Screens</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <p className="text-destructive mb-4">{error}</p>
-          {retryCount > 0 && (
-            <p className="text-sm text-muted-foreground">
-              Failed attempts: {retryCount}
-            </p>
-          )}
-          <div className="flex gap-2 justify-center">
-            <Button
-              onClick={fetchScreens}
-              disabled={isLoading}
-              variant="default"
-            >
-              {isLoading ? "Retrying..." : "Retry"}
-            </Button>
-            <Button
-              onClick={() => window.location.reload()}
-              variant="outline"
-              disabled={isLoading}
-            >
-              Refresh Page
-            </Button>
-          </div>
-          {retryCount > 2 && (
-            <p className="text-xs text-muted-foreground mt-4">
-              If the problem persists, please check your internet connection or
-              try again later.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="min-h-[70vh] w-full flex items-center justify-center">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <CardTitle className="text-2xl">Unable to Load Screens</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-destructive mb-4">{error}</p>
+            {retryCount > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Failed attempts: {retryCount}
+              </p>
+            )}
+            <div className="flex gap-2 justify-center">
+              <Button onClick={load} disabled={isLoading} variant="default">
+                {isLoading ? "Retrying..." : "Retry"}
+              </Button>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                disabled={isLoading}
+              >
+                Refresh Page
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  if (!isLoading && screens.length === 0) {
+  if (isLoading || !data) {
+    // Centered, animated loader — a shimmering globe placeholder + shimmer text,
+    // vertically and horizontally centered in the page.
     return (
-      <Card className="max-w-screen mx-auto">
-        <CardHeader className="text-center">
-          <div className="text-6xl mb-4">📽️</div>
-          <CardTitle className="text-2xl">Screens</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <div className="bg-muted/50 rounded-lg p-6">
-            <h3 className="font-semibold text-lg mb-2">No Screens Found</h3>
-            <p className="text-muted-foreground">
-              No screens available at the moment. Please check back later!
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="min-h-[70vh] w-full flex flex-col items-center justify-center gap-6">
+        <div className="relative">
+          <ShimmerSkeleton className="size-40 md:size-52 rounded-full" />
+          <span
+            className="absolute inset-0 flex items-center justify-center text-5xl md:text-6xl opacity-70"
+            aria-hidden
+          >
+            🌍
+          </span>
+        </div>
+        <ShimmeringText
+          text="Loading IMAX theaters worldwide…"
+          className="text-base md:text-lg font-medium"
+          duration={1.6}
+        />
+      </div>
+    );
+  }
+
+  if (data.features.length === 0) {
+    return (
+      <div className="min-h-[70vh] w-full flex items-center justify-center">
+        <Card className="max-w-screen mx-auto">
+          <CardHeader className="text-center">
+            <div className="text-6xl mb-4">📽️</div>
+            <CardTitle className="text-2xl">Screens</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="bg-muted/50 rounded-lg p-6">
+              <h3 className="font-semibold text-lg mb-2">No Screens Found</h3>
+              <p className="text-muted-foreground">
+                No screens available at the moment. Please check back later!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
     <div className="w-full md:container ms:mx-auto flex flex-col md:gap-4 gap-2">
       <h1 className="text-3xl font-semibold">IMAX Screens</h1>
-      {isLoading ? (
-        // <Card className="w-full p-8">
-        //   <div className="space-y-4 text-center">
-        //     <div className="text-6xl mb-4">🌍</div>
-        //     <div className="space-y-2">
-        //       <div className="h-6 w-64 bg-muted rounded mx-auto" />
-        //       <div className="h-4 w-48 bg-muted rounded mx-auto" />
-        //     </div>
-        //     <div className="mt-8 h-96 w-full bg-muted rounded animate-pulse flex items-center justify-center">
-        //       <div className="text-muted-foreground">
-        //         Loading interactive globe...
-        //       </div>
-        //     </div>
-        //   </div>
-        // </Card>
-        <LoadingSpinner size="lg" variant="spinner" className="h-full" />
-      ) : (
-        <MapLibreMap gpsPoints={screensWithValidCoords} />
-      )}
+      <ImaxMap data={data} />
     </div>
   );
 }

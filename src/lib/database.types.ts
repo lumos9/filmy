@@ -63,8 +63,10 @@ export interface Database {
           dimensions: string[]; // array of dimensions
           projections: string[]; // array of projections
           opened_date: string | null;
-          created_at: string;
-          updated_at: string;
+          // Audit timestamps are not shipped in the local data file (they lived
+          // only in the retired Supabase DB), so they are optional now.
+          created_at?: string;
+          updated_at?: string;
           latitude?: number | null;
           longitude?: number | null;
         };
